@@ -16,7 +16,7 @@ def get_actuators():
     return jsonify([dict(row) for row in data])
 
 # API para encender/apagar la luz del ESP32
-@actuator_bp.route('/toggle_light', methods=['POST'])
+@actuator_bp.route('/Actuator/toggle_light', methods=['POST'])
 def toggle_light():
     data = request.get_json()
     state = data.get('state')
