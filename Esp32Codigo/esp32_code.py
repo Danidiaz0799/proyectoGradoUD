@@ -5,11 +5,11 @@ from machine import Pin
 import time
 
 # Configuración de la red Wi-Fi
-ssid = 'PocoPro'  # Nombre de la red Wi-Fi
-password = 'hola12345'  # Contraseña de la red Wi-Fi
+ssid = 'StevPoco'  # Nombre de la red Wi-Fi
+password = 'hola1234567'  # Contraseña de la red Wi-Fi
 
 # Configuración del cliente MQTT
-server = '192.168.33.214'  # IP del servidor MQTT (Raspberry Pi)
+server = '192.168.20.44'  # IP del servidor MQTT (Raspberry Pi)
 client_id = 'ESP32_DHT11_Sensor'  # ID del cliente MQTT
 topic = b'temperatura_humedad'  # Tópico donde se publicarán los datos
 
