@@ -6,7 +6,7 @@ import time
 
 # Configuración de la red Wi-Fi
 ssid = 'PocoPro'  # Nombre de la red Wi-Fi
-password = 'Hola1234567'  # Contraseña de la red Wi-Fi
+password = 'hola12345'  # Contraseña de la red Wi-Fi
 
 # Configuración del cliente MQTT
 server = '192.168.33.214'  # IP del servidor MQTT (Raspberry Pi)
