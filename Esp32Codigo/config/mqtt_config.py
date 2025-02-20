@@ -1,7 +1,7 @@
 from umqtt.simple import MQTTClient
 from config import config
 
-# Función para conectar al broker MQTT con manejo de reconexión
+# Funcion para conectar al broker MQTT con manejo de reconexion
 def connect_mqtt():
     try:
         mqtt_client = MQTTClient(config.CLIENT_ID, config.SERVER)  # Crear cliente MQTT
@@ -10,4 +10,4 @@ def connect_mqtt():
     except Exception as e:
         print("Error al conectar al broker MQTT:", str(e))
         return None  # Retornar None si no se puede conectar
-    return mqtt_client
+    return mqtt_client  # Retornar el cliente MQTT si la conexion es exitosa
