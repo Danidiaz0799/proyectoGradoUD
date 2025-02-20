@@ -23,7 +23,7 @@ def get_db_connection():
 def save_sensor_data(temperature, humidity):
     conn = get_db_connection()
     conn.execute('INSERT INTO dht_data (timestamp, temperature, humidity) VALUES (?, ?, ?)',
-                 (datetime.now().isoformat(), temperature, humidity))
+                    (datetime.now().isoformat(), temperature, humidity))
     conn.commit()
     conn.close()
 
@@ -31,15 +31,15 @@ def save_sensor_data(temperature, humidity):
 def save_event(message):
     conn = get_db_connection()
     conn.execute('INSERT INTO events (timestamp, message) VALUES (?, ?)',
-                 (datetime.now().isoformat(), message))
+                    (datetime.now().isoformat(), message))
     conn.commit()
     conn.close()
 
 # Guardar estado de actuadores en la base de datos
 def save_actuator_state(name, state):
     conn = get_db_connection()
-    conn.execute('INSERT INTO actuators (timestamp, name, state) VALUES (?, ?, ?)', 
-                 (datetime.now().isoformat(), name, state))
+    conn.execute('INSERT INTO actuators (timestamp, name, state) VALUES (?, ?, ?)',
+                    (datetime.now().isoformat(), name, state))
     conn.commit()
     conn.close()
 

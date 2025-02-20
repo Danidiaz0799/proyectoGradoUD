@@ -3,7 +3,7 @@ import sqlite3
 def create_tables():
     conn = sqlite3.connect('sensor_data.db')
     c = conn.cursor()
-    
+
     # Crear tabla para datos de sensores
     c.execute('''
         CREATE TABLE IF NOT EXISTS dht_data (
@@ -14,7 +14,7 @@ def create_tables():
         )
     ''')
     print("Tabla dht_data creada o ya existe.")
-    
+
     # Crear tabla para eventos
     c.execute('''
         CREATE TABLE IF NOT EXISTS events (
@@ -24,7 +24,7 @@ def create_tables():
         )
     ''')
     print("Tabla events creada o ya existe.")
-    
+
     # Crear tabla para actuadores
     c.execute('''
         CREATE TABLE IF NOT EXISTS actuators (
@@ -35,7 +35,7 @@ def create_tables():
         )
     ''')
     print("Tabla actuators creada o ya existe.")
-    
+
     conn.commit()
     conn.close()
     print("Base de datos creada y tablas inicializadas.")
