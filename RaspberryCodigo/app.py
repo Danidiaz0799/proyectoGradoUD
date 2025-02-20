@@ -7,10 +7,10 @@ from routes.actuator_routes import actuator_bp
 from mqtt_client import connect_mqtt
 import os
 
-# Configuración de la carpeta donde está la app Angular
+# Configuracion de la carpeta donde esta la app Angular
 ANGULAR_BUILD_FOLDER = "/home/stevpi/Desktop/proyectoGradoUD/angular_app/dist/mushroom-automation"
 
-# Crear la aplicación Flask
+# Crear la aplicacion Flask
 app = Flask(__name__, static_folder=ANGULAR_BUILD_FOLDER)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Permitir acceso desde cualquier origen
 
@@ -19,7 +19,7 @@ app.register_blueprint(sensor_bp)
 app.register_blueprint(event_bp)
 app.register_blueprint(actuator_bp)
 
-# Ruta para servir archivos estáticos (JS, CSS, imágenes, etc.)
+# Ruta para servir archivos estaticos (JS, CSS, imagenes, etc.)
 @app.route('/<path:filename>')
 def serve_static_files(filename):
     file_path = os.path.join(ANGULAR_BUILD_FOLDER, filename)
@@ -29,12 +29,12 @@ def serve_static_files(filename):
     # Si no existe, devolver el index.html (manejo de rutas SPA)
     return send_from_directory(ANGULAR_BUILD_FOLDER, 'index.html')
 
-# Ruta para servir la página principal
+# Ruta para servir la pagina principal
 @app.route('/')
 def serve_index():
     return send_from_directory(ANGULAR_BUILD_FOLDER, 'index.html')
 
-# Iniciar la aplicación
+# Iniciar la aplicacion
 if __name__ == '__main__':
     connect_mqtt()  # Conectar al broker MQTT
-    app.run(host='0.0.0.0', port=5000)  # Modo producción sin debug
+    app.run(host='0.0.0.0', port=5000)  # Modo produccion sin debug
