@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import paho.mqtt.client as mqtt
-import os
 import sqlite3
 from datetime import datetime
 
@@ -64,20 +63,6 @@ def connect_mqtt():
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
     client.subscribe('temperatura_humedad')  # Suscribirse al topico donde el ESP32 publica
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
-
-# Ruta principal (pagina de inicio)
-@app.route('/')
-def index():
-    try:
-        # Asegurarse de que Flask pueda encontrar la carpeta de plantillas
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        templates_path = os.path.join(current_path, 'templates')
-        if not os.path.exists(templates_path):
-            print(f"Directorio de plantillas no encontrado: {templates_path}")
-        return render_template('index.html')
-    except Exception as e:
-        print(f"Error al renderizar el template: {e}")
-        return "Error interno en el servidor", 500
 
 # API para enviar datos al frontend
 @app.route('/data')
