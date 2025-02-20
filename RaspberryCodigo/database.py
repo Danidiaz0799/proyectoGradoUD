@@ -1,6 +1,6 @@
 import sqlite3
 
-# Función para crear las tablas en la base de datos
+# Funcion para crear las tablas en la base de datos
 def create_tables():
     conn = sqlite3.connect('sensor_data.db')
     c = conn.cursor()
@@ -41,6 +41,6 @@ def create_tables():
     conn.close()
     print("Base de datos creada y tablas inicializadas.")
 
-# Ejecutar la función para crear las tablas si el archivo se ejecuta directamente
+# Ejecutar la funcion para crear las tablas si el archivo se ejecuta directamente
 if __name__ == '__main__':
     create_tables()
