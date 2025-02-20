@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models.actuator import save_actuator_state, get_db_connection
+from mqtt_client import publish_message
 
 actuator_bp = Blueprint('actuator_bp', __name__)
 
@@ -14,14 +15,13 @@ def get_actuators():
     conn.close()
     return jsonify([dict(row) for row in data])
 
-# API para insertar estados de actuadores en la base de datos
-@actuator_bp.route('/add_actuator_state', methods=['POST'])
-def add_actuator_state():
+# API para encender/apagar la luz del ESP32
+@actuator_bp.route('/toggle_light', methods=['POST'])
+def toggle_light():
     data = request.get_json()
-    name = data.get('name')
     state = data.get('state')
-    if name and state is not None:
-        save_actuator_state(name, state)
-        return jsonify({"message": "Estado del actuador guardado correctamente"}), 201
+    if state is not None:
+        publish_message('esp32/light', str(state).lower())
+        return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
         return jsonify({"error": "Datos incompletos"}), 400

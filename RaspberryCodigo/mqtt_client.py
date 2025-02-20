@@ -1,7 +1,9 @@
 import paho.mqtt.client as mqtt
 from models.sensor_data import save_sensor_data
 
-# Función de callback cuando se recibe un mensaje MQTT
+client = None
+
+# Funcion de callback cuando se recibe un mensaje MQTT
 def on_message(client, userdata, msg):
     try:
         # Decodificar el mensaje en UTF-8 y manejar errores
@@ -13,10 +15,17 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f'Error al procesar el mensaje: {e}')
 
-# Configuración del cliente MQTT
+# Funcion para publicar mensajes MQTT
+def publish_message(topic, message):
+    global client
+    if client:
+        client.publish(topic, message)
+
+# Configuracion del cliente MQTT
 def connect_mqtt():
+    global client
     client = mqtt.Client()
     client.on_message = on_message
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
-    client.subscribe('temperatura_humedad')  # Suscribirse al tópico donde el ESP32 publica
+    client.subscribe('temperatura_humedad')  # Suscribirse al topico donde el ESP32 publica
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
