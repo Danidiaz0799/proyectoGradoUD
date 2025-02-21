@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.actuator import save_actuator_state, get_db_connection
 from mqtt_client import publish_message
+from models.event import save_event  # Importar la función para guardar eventos
 
 actuator_bp = Blueprint('actuator_bp', __name__)
 
@@ -22,8 +23,8 @@ def toggle_light():
     state = data.get('state')
     if state is not None:
         publish_message('esp32/light', str(state).lower())
-        save_actuator_state('Iluminacion', state)  # Guardar el estado del actuador en la base de datos
-        save_actuator_state('Ventilacion', state)
+        save_event(f"Actuador Iluminacion cambiado a {state}")  # Guardar evento
+        save_event(f"Actuador Ventilacion cambiado a {state}")  # Guardar evento
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
         return jsonify({"error": "Datos incompletos"}), 400

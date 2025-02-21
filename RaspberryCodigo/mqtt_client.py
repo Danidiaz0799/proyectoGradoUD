@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 from models.sensor_data import save_sensor_data
+from models.event import save_event  # Importar la función para guardar eventos
 
 client = None
 
@@ -12,14 +13,18 @@ def on_message(client, userdata, msg):
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
             save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
         print(f'Temperatura: {temperatura}, Humedad: {humedad}')
+        save_event(f"Datos recibidos - Temperatura: {temperatura}, Humedad: {humedad}")  # Guardar evento
     except Exception as e:
         print(f'Error al procesar el mensaje: {e}')
+        save_event(f"Error al procesar el mensaje: {e}")  # Guardar evento
 
 # Funcion para publicar mensajes MQTT
 def publish_message(topic, message):
     global client
     if client:
         client.publish(topic, message)
+    else:
+        print("Cliente MQTT no esta conectado")
 
 # Configuracion del cliente MQTT
 def connect_mqtt():
@@ -29,3 +34,6 @@ def connect_mqtt():
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
     client.subscribe('temperatura_humedad')  # Suscribirse al topico donde el ESP32 publica
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
+
+# Conectar al cliente MQTT al iniciar el módulo
+connect_mqtt()
