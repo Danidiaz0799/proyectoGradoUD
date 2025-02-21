@@ -12,7 +12,6 @@ def toggle_light():
     if state is not None:
         publish_message('esp32/light', str(state).lower())
         save_event(f"Actuador Iluminacion cambiado a {state}")  # Guardar evento
-        save_event(f"Actuador Ventilacion cambiado a {state}")  # Guardar evento
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
         return jsonify({"error": "Datos incompletos"}), 400

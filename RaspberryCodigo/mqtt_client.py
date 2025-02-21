@@ -12,11 +12,15 @@ def on_message(client, userdata, msg):
         if len(data) == 2:
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
             save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
-        print(f'Temperatura: {temperatura}, Humedad: {humedad}')
-        save_event(f"Datos recibidos - Temperatura: {temperatura}, Humedad: {humedad}")  # Guardar evento
+            # Verificar si la temperatura o la humedad están fuera de los parámetros
+            if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
+                save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}")
+            if not (60 <= float(humedad) <= 90):  # Rango de humedad aceptable
+                save_event(f"Advertencia: Humedad fuera de rango - {humedad}")
+        else:
+            print("Datos recibidos en formato incorrecto")
     except Exception as e:
         print(f'Error al procesar el mensaje: {e}')
-        save_event(f"Error al procesar el mensaje: {e}")  # Guardar evento
 
 # Funcion para publicar mensajes MQTT
 def publish_message(topic, message):
