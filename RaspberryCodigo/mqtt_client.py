@@ -11,6 +11,7 @@ def on_message(client, userdata, msg):
         data = msg.payload.decode('utf-8', errors='ignore').split(',')
         if len(data) == 2:
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
+            print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
             save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
             # Verificar si la temperatura o la humedad están fuera de los parámetros
             if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
@@ -38,6 +39,3 @@ def connect_mqtt():
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
     client.subscribe('temperatura_humedad')  # Suscribirse al topico donde el ESP32 publica
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
-
-# Conectar al cliente MQTT al iniciar el módulo
-connect_mqtt()

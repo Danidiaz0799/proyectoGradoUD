@@ -37,6 +37,17 @@ def create_tables():
     ''')
     print("Tabla actuators creada o ya existe.")
 
+    # Insertar actuadores predeterminados
+    c.execute('''
+        INSERT INTO actuators (name, state, timestamp)
+        VALUES ('Iluminacion', 0, datetime('now'))
+    ''')
+    c.execute('''
+        INSERT INTO actuators (name, state, timestamp)
+        VALUES ('Ventilacion', 0, datetime('now'))
+    ''')
+    print("Actuadores predeterminados insertados.")
+
     conn.commit()
     conn.close()
     print("Base de datos creada y tablas inicializadas.")
