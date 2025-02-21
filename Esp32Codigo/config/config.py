@@ -1,4 +1,4 @@
-# Configuracion de la red Wi-Fi
+# Configuracion de la red Wi-Fi1233456
 SSID = 'StevPoco'  # Nombre de la red Wi-Fi
 PASSWORD = 'hola1234567'  # Contrasena de la red Wi-Fi
 

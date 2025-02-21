@@ -14,3 +14,11 @@ def save_sensor_data(temperature, humidity):
                     (datetime.now().isoformat(), temperature, humidity))
     conn.commit()
     conn.close()
+
+# Obtener todos los datos de sensores desde la base de datos
+def get_all_sensor_data(page, page_size):
+    conn = get_db_connection()
+    data = conn.execute('SELECT * FROM dht_data ORDER BY timestamp DESC LIMIT ? OFFSET ?',
+                        (page_size, (page - 1) * page_size)).fetchall()
+    conn.close()
+    return data
