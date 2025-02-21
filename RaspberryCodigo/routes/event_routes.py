@@ -3,10 +3,12 @@ from models.event import save_event, get_all_events, update_event
 
 event_bp = Blueprint('event_bp', __name__)
 
-# API para obtener eventos desde la base de datos
+# API para obtener eventos desde la base de datos con paginación
 @event_bp.route('/Event', methods=['GET'])
 def get_events():
-    data = get_all_events()
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('pageSize', 10))
+    data = get_all_events(page, page_size)
     return jsonify([dict(row) for row in data])
 
 # API para insertar eventos en la base de datos

@@ -10,10 +10,11 @@ def save_event(message):
     conn.commit()
     conn.close()
 
-# Obtener todos los eventos desde la base de datos
-def get_all_events():
+# Obtener todos los eventos desde la base de datos con paginación
+def get_all_events(page, page_size):
     conn = get_db_connection()
-    data = conn.execute('SELECT * FROM events').fetchall()
+    data = conn.execute('SELECT * FROM events ORDER BY timestamp DESC LIMIT ? OFFSET ?',
+                        (page_size, (page - 1) * page_size)).fetchall()
     conn.close()
     return data
 
