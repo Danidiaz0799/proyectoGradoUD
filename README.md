@@ -1,4 +1,5 @@
 # proyectoGradoUD
+![image](https://github.com/user-attachments/assets/6a5322b3-7d50-4350-ae90-57fdf479fd64)
 
 Código del proyecto de grado de tecnología de la universidad Distrital
 
@@ -7,11 +8,7 @@ Código del proyecto de grado de tecnología de la universidad Distrital
 Este proyecto tiene como objetivo desarrollar una aplicación innovadora que resuelva problemas específicos en el ámbito de la tecnología. Utiliza diversas tecnologías modernas y sigue las mejores prácticas de desarrollo de software para garantizar un producto final robusto y eficiente.
 
 ## Tecnologías Utilizadas
-
-- Lenguaje de programación: [Especificar lenguaje]
-- Framework: [Especificar framework]
-- Base de datos: [Especificar base de datos]
-- Herramientas adicionales: [Especificar herramientas]
+- Lenguaje de programación: [Python, Angular, Flask]
 
 ## Código del ESP32
 
@@ -37,35 +34,3 @@ El código de la Raspberry Pi está diseñado para recibir los datos publicados 
 - `routes/event_routes.py`: Define las rutas API para obtener y agregar eventos.
 - `routes/actuator_routes.py`: Define las rutas API para obtener y agregar estados de actuadores.
 
-## Instalación
-
-1. Clonar el repositorio:
-   ```bash
-   git clone [URL del repositorio]
-   ```
-2. Navegar al directorio del proyecto:
-   ```bash
-   cd proyectoGradoUD
-   ```
-3. Instalar las dependencias:
-   ```bash
-   [Comando de instalación de dependencias]
-   ```
-
-## Uso
-
-[Instrucciones sobre cómo usar la aplicación]
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Por favor, sigue los pasos a continuación para contribuir:
-
-1. Haz un fork del repositorio.
-2. Crea una nueva rama (`git checkout -b feature/nueva-funcionalidad`).
-3. Realiza tus cambios y haz commit (`git commit -am 'Añadir nueva funcionalidad'`).
-4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`).
-5. Abre un Pull Request.
-
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia [Nombre de la licencia].
