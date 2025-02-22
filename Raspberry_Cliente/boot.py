@@ -8,12 +8,14 @@ import RPi.GPIO as GPIO
 
 # Configuracion del pin de la luz de la Raspberry Pi
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)  # Desactivar advertencias de GPIO
 light_pin = 2  # Pin al que esta conectada la luz de la Raspberry Pi
 GPIO.setup(light_pin, GPIO.OUT)
 
 # Funcion de callback para manejar mensajes MQTT
 def on_message(client, userdata, message):
-    if message.topic == 'raspberry/light':
+    print(f"Mensaje recibido en el topico {message.topic}: {message.payload.decode('utf-8')}")
+    if message.topic == config.TOPIC_LIGHT:
         state = message.payload.decode('utf-8')
         GPIO.output(light_pin, GPIO.HIGH if state == 'true' else GPIO.LOW)  # Encender o apagar la luz
 
@@ -27,23 +29,26 @@ def mqtt_loop(client):
             client = connect_mqtt()  # Intentar reconectar si falla la conexion MQTT
         time.sleep(1)  # Esperar 1 segundo antes de verificar nuevamente
 
-# Funcion para publicar datos del sensor
+# Funcion para publicar datos del sensor DHT11
 def sensor_loop(client):
     while True:
         try:
-            publish_sensor_data(client, config.TOPIC)  # Publicar datos del sensor
+            publish_sensor_data(client, config.TOPIC_SENSOR)  # Publicar datos del sensor DHT11
         except OSError as e:
-            print("Error en el loop de sensores:", str(e))
+            print("Error en el loop de sensores DHT11:", str(e))
         time.sleep(5)  # Esperar 5 segundos entre publicaciones
 
 # Funcion principal del programa
 def main():
     # Intentar conectarse al Wi-Fi
     if connect_wifi():
+        print("Conexion Wi-Fi establecida")
         client = connect_mqtt()  # Intentar conectar al broker MQTT
         if client:  # Si se conecta correctamente al broker
+            print("Conexion al broker MQTT establecida")
             client.on_message = on_message  # Configurar callback de mensajes
-            client.subscribe('raspberry/light')  # Suscribirse al topico para controlar la luz
+            client.subscribe(config.TOPIC_LIGHT)  # Suscribirse al topico para controlar la luz
+            print("Suscrito al topico de control de luz")
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sensor_loop, args=(client,)).start()
