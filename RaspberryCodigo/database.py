@@ -21,7 +21,8 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             message TEXT NOT NULL,
-            timestamp TEXT NOT NULL
+            timestamp TEXT NOT NULL,
+            topic TEXT NOT NULL
         )
     ''')
     print("Tabla events creada o ya existe.")

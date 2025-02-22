@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 from models.sensor_data import save_sensor_data
-from models.event import save_event  # Importar la función para guardar eventos
+from models.event import save_event  # Importar la funcion para guardar eventos
 
 client = None
 
@@ -13,11 +13,11 @@ def on_message(client, userdata, msg):
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
             print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
             save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
-            # Verificar si la temperatura o la humedad están fuera de los parámetros
+            # Verificar si la temperatura o la humedad estan fuera de los parametros
             if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
-                save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}")
+                save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}", "temperatura")
             if not (60 <= float(humedad) <= 90):  # Rango de humedad aceptable
-                save_event(f"Advertencia: Humedad fuera de rango - {humedad}")
+                save_event(f"Advertencia: Humedad fuera de rango - {humedad}", "humedad")
         else:
             print("Datos recibidos en formato incorrecto")
     except Exception as e:
