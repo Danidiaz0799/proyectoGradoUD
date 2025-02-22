@@ -7,4 +7,3 @@ SERVER = '192.168.20.44'  # IP del servidor MQTT (Raspberry Pi)
 CLIENT_ID = 'ESP32_DHT11_Sensor'  # ID del cliente MQTT
 TOPIC_SENSOR = 'temperatura_humedad'  # Topico donde se publicaran los datos del sensor DHT11
 TOPIC_LIGHT = 'raspberry/light'  # Topico para controlar la luz
-TOPIC_BMP280 = 'temperatura_presion'  # Topico donde se publicaran los datos del sensor BMP280
