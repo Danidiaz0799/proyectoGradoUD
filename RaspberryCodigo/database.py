@@ -21,7 +21,8 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             message TEXT NOT NULL,
-            timestamp TEXT NOT NULL
+            timestamp TEXT NOT NULL,
+            topic TEXT NOT NULL
         )
     ''')
     print("Tabla events creada o ya existe.")
@@ -36,6 +37,17 @@ def create_tables():
         )
     ''')
     print("Tabla actuators creada o ya existe.")
+
+    # Insertar actuadores predeterminados
+    c.execute('''
+        INSERT INTO actuators (name, state, timestamp)
+        VALUES ('Iluminacion', 0, datetime('now'))
+    ''')
+    c.execute('''
+        INSERT INTO actuators (name, state, timestamp)
+        VALUES ('Ventilacion', 0, datetime('now'))
+    ''')
+    print("Actuadores predeterminados insertados.")
 
     conn.commit()
     conn.close()
