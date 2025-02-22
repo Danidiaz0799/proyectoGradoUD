@@ -1,16 +1,20 @@
-import network
+import subprocess
+from config import config
 
 def connect_wifi():
-    ssid = "tu_ssid"
-    password = "tu_password"
+    ssid = config.SSID
+    password = config.PASSWORD
     
-    station = network.WLAN(network.STA_IF)
-    station.active(True)
-    station.connect(ssid, password)
-    
-    while not station.isconnected():
-        pass
-    
-    print("Conexión Wi-Fi establecida")
-    print(station.ifconfig())
-    return True
+    try:
+        # Escanear redes Wi-Fi disponibles
+        result = subprocess.run(['nmcli', 'dev', 'wifi'], capture_output=True, text=True, check=True)
+        print("Redes Wi-Fi disponibles:")
+        print(result.stdout)
+        
+        # Conectar a la red Wi-Fi
+        subprocess.run(['sudo', 'nmcli', 'd', 'wifi', 'connect', ssid, 'password', password], check=True)
+        print("Conexion Wi-Fi establecida")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error al conectar a la red Wi-Fi: {e}")
+        return False
