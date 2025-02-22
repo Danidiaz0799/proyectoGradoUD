@@ -12,10 +12,6 @@ def clean_tables():
     c.execute('DELETE FROM events')
     print("Datos de la tabla events limpiados.")
 
-    # Limpiar datos de la tabla actuators
-    c.execute('DELETE FROM actuators')
-    print("Datos de la tabla actuators limpiados.")
-
     conn.commit()
     conn.close()
     print("Base de datos limpiada.")
