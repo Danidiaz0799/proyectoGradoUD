@@ -18,6 +18,14 @@ def get_all_events(page, page_size):
     conn.close()
     return data
 
+# Obtener eventos filtrados por tema
+def get_events_by_topic(topic, page, page_size):
+    conn = get_db_connection()
+    data = conn.execute('SELECT * FROM events WHERE topic = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?',
+                        (topic, page_size, (page - 1) * page_size)).fetchall()
+    conn.close()
+    return data
+
 # Actualizar un evento en la base de datos
 def update_event(id, message, topic):
     conn = get_db_connection()

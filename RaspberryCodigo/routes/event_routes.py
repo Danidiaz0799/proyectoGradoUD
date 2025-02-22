@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.event import save_event, get_all_events, update_event
+from models.event import save_event, get_all_events, update_event, get_events_by_topic
 
 event_bp = Blueprint('event_bp', __name__)
 
@@ -23,14 +23,14 @@ def add_event():
     else:
         return jsonify({"error": "Mensaje y topico del evento son requeridos"}), 400
 
-# API para actualizar un evento en la base de datos
-@event_bp.route('/Event/<int:id>', methods=['PUT'])
-def update_event_endpoint(id):
-    data = request.get_json()
-    message = data.get('message')
-    topic = data.get('topic')
-    if message and topic:
-        update_event(id, message, topic)
-        return jsonify({"message": "Evento actualizado correctamente"}), 200
+# API para obtener eventos filtrados por tema con paginacion
+@event_bp.route('/Event/FilterByTopic', methods=['GET'])
+def get_events_by_topic_endpoint():
+    topic = request.args.get('topic')
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('pageSize', 10))
+    if topic:
+        data = get_events_by_topic(topic, page, page_size)
+        return jsonify([dict(row) for row in data])
     else:
-        return jsonify({"error": "Mensaje y topico del evento son requeridos"}), 400
+        return jsonify({"error": "El tema es requerido"}), 400
