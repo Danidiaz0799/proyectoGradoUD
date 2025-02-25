@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from config.wifi_config import connect_wifi
 from config.mqtt_config import connect_mqtt
-from sensors.dataSensors import publish_sensors_data
+from sensors.dataSensors import publish_sensor_data
 from config import config
 import time
 import threading
@@ -33,7 +33,7 @@ def mqtt_loop(client):
 def sensors_loop(client):
     while True:
         try:
-            publish_sensors_data(client, config.TOPIC_SENSOR_DHT11)  # Publicar datos del sensor DHT11
+            publish_sensor_data(client, config.TOPIC_SENSOR_DHT11)  # Publicar datos del sensor DHT11
         except OSError as e:
             print("Error en el loop de sensores:", str(e)) # Mensaje de error
         time.sleep(5)  # Esperar 5 segundos entre publicaciones
