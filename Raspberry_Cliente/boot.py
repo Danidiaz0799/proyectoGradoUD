@@ -2,23 +2,17 @@
 from config.wifi_config import connect_wifi
 from config.mqtt_config import connect_mqtt
 from sensors.dht11 import publish_sensor_data
+from actuators.light import control_light
 from config import config
 import time
 import threading
-import RPi.GPIO as GPIO
-
-
-GPIO.setmode(GPIO.BCM) # Configuracion del pin de la luz de la Raspberry Pi
-GPIO.setwarnings(False)  # Desactivar advertencias de GPIO
-light_pin = 2  # Pin al que esta conectada la luz de la Raspberry Pi
-GPIO.setup(light_pin, GPIO.OUT) # Se configura el pin como salida
 
 # Funcion de callback para manejar mensajes MQTT
-def on_message(client, userdata, message):
-    print(f"Mensaje recibido en el topico {message.topic}: {message.payload.decode('utf-8')}") # Mensaje de depuración
+def on_message(message):
+    print(f"Mensaje recibido en el topico {message.topic}: {message.payload.decode('utf-8')}")
     if message.topic == config.TOPIC_LIGHT:
-        state = message.payload.decode('utf-8') # Obtener el estado de la luz
-        GPIO.output(light_pin, GPIO.HIGH if state == 'true' else GPIO.LOW)  # Encender o apagar la luz
+        state = message.payload.decode('utf-8')
+        control_light(state)
 
 # Funcion para manejar la conexion MQTT y recibir mensajes
 def mqtt_loop(client):
