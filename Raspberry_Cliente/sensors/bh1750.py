@@ -25,6 +25,8 @@ def convert_to_number(data):
 
 def read_bh1750():
     try:
+        bus.write_byte(DEVICE, POWER_ON)  # Encender el sensor
+        time.sleep(0.2)  # Esperar a que el sensor se estabilice
         light_level = read_light()
         return {'light': light_level}
     except Exception as e:
