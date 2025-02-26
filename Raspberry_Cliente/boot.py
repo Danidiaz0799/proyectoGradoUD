@@ -42,11 +42,9 @@ def sensor_loop(client):
 # Funcion principal del programa
 def main():
     # Intentar conectarse al Wi-Fi
-    if connect_wifi():
-        print("Conexion Wi-Fi establecida")
+    if connect_wifi(): # Si se conecta correctamente al Wi-Fi
         client = connect_mqtt()  # Intentar conectar al broker MQTT
         if client:  # Si se conecta correctamente al broker
-            print("Conexion al broker MQTT establecida")
             client.on_message = on_message  # Configurar callback de mensajes
             client.subscribe(config.TOPIC_LIGHT)  # Suscribirse al topico para controlar la luz
             print("Suscrito al topico de control de luz")
