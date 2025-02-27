@@ -17,6 +17,18 @@ def toggle_light():
     else:
         return jsonify({"error": "Datos incompletos"}), 400
 
+# API para encender/apagar el ventilador del Raspberry
+@actuator_bp.route('/Actuator/toggle_fan', methods=['POST'])
+def toggle_fan():
+    data = request.get_json()
+    state = data.get('state')
+    if state is not None:
+        publish_message('raspberry/fan', str(state).lower())
+        save_event(f"Actuador Ventilador cambiado a {state}", "ventilador")  # Guardar evento
+        return jsonify({"message": "Senal enviada correctamente"}), 200
+    else:
+        return jsonify({"error": "Datos incompletos"}), 400
+
 # API para obtener actuadores desde la base de datos
 @actuator_bp.route('/Actuator', methods=['GET'])
 def get_actuators():

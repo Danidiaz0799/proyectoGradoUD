@@ -3,6 +3,7 @@ from config.wifi_config import connect_wifi
 from config.mqtt_config import connect_mqtt
 from sensors.dht11 import publish_sensor_data
 from actuators.light import control_light
+from actuators.fan import control_fan  # Importar la función para controlar el ventilador
 from config import config
 import time
 import threading
@@ -13,6 +14,9 @@ def on_message(client, userdata, message):  # Modificar para aceptar los argumen
     if message.topic == config.TOPIC_LIGHT:
         state = message.payload.decode('utf-8')
         control_light(state)
+    elif message.topic == config.TOPIC_FAN:  # Manejar el tópico del ventilador
+        state = message.payload.decode('utf-8')
+        control_fan(state)
 
 # Funcion para manejar la conexion MQTT y recibir mensajes
 def mqtt_loop(client):
@@ -41,6 +45,7 @@ def main():
         if client:  # Si se conecta correctamente al broker
             client.on_message = on_message  # Configurar callback de mensajes
             client.subscribe(config.TOPIC_LIGHT)  # Suscribirse al topico para controlar la luz
+            client.subscribe(config.TOPIC_FAN)  # Suscribirse al topico para controlar el ventilador
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sensor_loop, args=(client,)).start()
