@@ -1,0 +1,15 @@
+[Unit]
+Description=Proyecto Grado UD Cliente
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/pi/Desktop/raspClient
+ExecStart=/bin/bash -c 'source /home/pi/myenv/bin/activate && python /home/pi/Desktop/raspClient/boot.py'
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=proyectoGradoUDCliente
+
+[Install]
+WantedBy=multi-user.target
