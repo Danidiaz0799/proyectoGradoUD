@@ -2,7 +2,7 @@ import sqlite3
 
 # Funcion para crear las tablas en la base de datos
 def create_tables():
-    conn = sqlite3.connect('sensor_data.db')
+    conn = sqlite3.connect('/home/stevpi/Desktop/raspServer/sensor_data.db')
     c = conn.cursor()
 
     # Crear tabla para datos de sensores
