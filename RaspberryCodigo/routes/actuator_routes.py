@@ -5,13 +5,13 @@ from models.actuator import save_actuator_state, update_actuator_state, get_all_
 
 actuator_bp = Blueprint('actuator_bp', __name__)
 
-# API para encender/apagar la luz del ESP32
+# API para encender/apagar la luz del Raspberry
 @actuator_bp.route('/Actuator/toggle_light', methods=['POST'])
 def toggle_light():
     data = request.get_json()
     state = data.get('state')
     if state is not None:
-        publish_message('esp32/light', str(state).lower())
+        publish_message('raspberry/light', str(state).lower())
         save_event(f"Actuador Iluminacion cambiado a {state}", "iluminacion")  # Guardar evento
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:

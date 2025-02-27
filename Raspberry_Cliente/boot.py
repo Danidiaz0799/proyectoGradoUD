@@ -8,7 +8,7 @@ import time
 import threading
 
 # Funcion de callback para manejar mensajes MQTT
-def on_message(message):
+def on_message(client, userdata, message):  # Modificar para aceptar los argumentos adicionales
     print(f"Mensaje recibido en el topico {message.topic}: {message.payload.decode('utf-8')}")
     if message.topic == config.TOPIC_LIGHT:
         state = message.payload.decode('utf-8')

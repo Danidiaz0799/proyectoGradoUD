@@ -7,4 +7,3 @@ GPIO.setup(light_pin, GPIO.OUT)
 
 def control_light(state):
     GPIO.output(light_pin, GPIO.HIGH if state == 'true' else GPIO.LOW)
-    print(f"Luz {'encendida' if state == 'true' else 'apagada'}")
