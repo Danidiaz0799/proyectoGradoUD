@@ -13,6 +13,7 @@ def toggle_light():
     if state is not None:
         publish_message('raspberry/light', str(state).lower())
         save_event(f"Actuador Iluminacion cambiado a {state}", "iluminacion")  # Guardar evento
+        update_actuator_state(1, state)  # Actualizar estado del actuador en la base de datos
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
         return jsonify({"error": "Datos incompletos"}), 400
@@ -25,6 +26,7 @@ def toggle_fan():
     if state is not None:
         publish_message('raspberry/fan', str(state).lower())
         save_event(f"Actuador Ventilador cambiado a {state}", "ventilador")  # Guardar evento
+        update_actuator_state(2, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
         return jsonify({"error": "Datos incompletos"}), 400
