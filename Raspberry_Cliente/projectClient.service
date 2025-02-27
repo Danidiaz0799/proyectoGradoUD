@@ -9,7 +9,7 @@ ExecStart=/bin/bash -c 'source /home/pi/myenv/bin/activate && python /home/pi/De
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=proyectoGradoUDCliente
+SyslogIdentifier=raspClient
 
 [Install]
 WantedBy=multi-user.target

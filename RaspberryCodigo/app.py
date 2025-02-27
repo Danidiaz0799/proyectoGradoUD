@@ -8,7 +8,7 @@ from mqtt_client import connect_mqtt
 import os
 
 # Configuracion de la carpeta donde esta la app Angular
-ANGULAR_BUILD_FOLDER = "/home/stevpi/Desktop/proyectoGradoUD/angular_app/dist/mushroom-automation"
+ANGULAR_BUILD_FOLDER = "/home/stevpi/Desktop/raspServer/angular_app/dist/mushroom-automation"
 
 # Crear la aplicacion Flask
 app = Flask(__name__, static_folder=ANGULAR_BUILD_FOLDER)
