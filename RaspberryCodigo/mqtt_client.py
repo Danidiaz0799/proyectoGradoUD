@@ -46,5 +46,5 @@ def connect_mqtt():
     client = mqtt.Client()
     client.on_message = on_message
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
-    client.subscribe('temperatura_humedad')  # Suscribirse al topico donde el ESP32 publica
+    client.subscribe('sensor/dht11')  # Suscribirse al topico donde el ESP32 publica
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
