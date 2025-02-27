@@ -19,6 +19,6 @@ def publish_dht11_data(client, topic):
         hum = sensor_data['humidity']
         message = '{0},{1}'.format(temp, hum).encode('utf-8')  # Formato del mensaje y conversion a bytes
         client.publish(topic, message)  # Publicar los datos al topico
-        print("Datos publicados:", message)
+        print("Datos publicados:", message, "en el topico:", topic)
     else:
         print("Error al leer los datos del sensor")

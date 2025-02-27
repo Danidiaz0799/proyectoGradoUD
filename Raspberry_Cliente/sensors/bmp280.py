@@ -18,6 +18,6 @@ def publish_bmp280_data(client, topic):
         pressure = sensor_data['pressure']
         message = '{0},{1}'.format(temp, pressure).encode('utf-8')
         client.publish(topic, message)
-        print("Datos BMP280 publicados:", message)
+        print("Datos BMP280 publicados:", message, "en el topico:", topic)
     else:
         print("Error al leer los datos del sensor BMP280")
