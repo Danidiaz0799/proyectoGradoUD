@@ -33,11 +33,11 @@ def handle_dht11_message(data):
     # Verificar si la temperatura o la humedad estan fuera de los parametros
     if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
         if current_time - last_temp_event_time > 60:
-            save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}", "temperatura")
+            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} ° C", "temperatura")
             last_temp_event_time = current_time
     if not (60 <= float(humedad) <= 90):  # Rango de humedad aceptable
         if current_time - last_hum_event_time > 60:
-            save_event(f"Advertencia: Humedad fuera de rango - {humedad}", "humedad")
+            save_event(f"Advertencia! Humedad fuera de rango: {humedad} %", "humedad")
             last_hum_event_time = current_time
 
 def handle_bmp280_message(data):
@@ -49,7 +49,7 @@ def handle_bmp280_message(data):
     # Verificar si la temperatura esta fuera de los parametros
     if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
         if current_time - last_temp_event_time > 60:
-            save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}", "temperatura")
+            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} ° C", "temperatura")
             last_temp_event_time = current_time
 
 def handle_gy302_message(data):
