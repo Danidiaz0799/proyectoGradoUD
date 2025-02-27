@@ -10,11 +10,11 @@ Este proyecto tiene como objetivo desarrollar una aplicación innovadora que res
 ## Tecnologías Utilizadas
 - Lenguaje de programación: [Python, Angular, Flask]
 
-## Código del ESP32
+## Código de la Raspberry Cliente
 
-El código del ESP32 está diseñado para leer datos de un sensor DHT11 y publicarlos en un broker MQTT. A continuación se describen los archivos principales:
+El código de la Raspberry Cliente está diseñado para leer datos de un sensor DHT11 y publicarlos en un broker MQTT. A continuación se describen los archivos principales:
 
-- `esp32_code.py`: Contiene la función principal que gestiona la conexión Wi-Fi, la conexión al broker MQTT y la publicación de datos del sensor.
+- `boot.py`: Contiene la función principal que gestiona la conexión Wi-Fi, la conexión al broker MQTT y la publicación de datos del sensor.
 - `config/wifi_config.py`: Configura y maneja la conexión Wi-Fi.
 - `config/mqtt_config.py`: Configura y maneja la conexión al broker MQTT.
 - `sensors/sensor_config.py`: Configura el sensor DHT11 y define la función para publicar los datos del sensor.
@@ -22,10 +22,10 @@ El código del ESP32 está diseñado para leer datos de un sensor DHT11 y public
 
 ## Código de la Raspberry Pi
 
-El código de la Raspberry Pi está diseñado para recibir los datos publicados por el ESP32, almacenarlos en una base de datos y proporcionar una API para acceder a estos datos. A continuación se describen los archivos principales:
+El código de la Raspberry Pi está diseñado para recibir los datos publicados por la Raspberry Cliente, almacenarlos en una base de datos y proporcionar una API para acceder a estos datos. A continuación se describen los archivos principales:
 
 - `app.py`: Configura y ejecuta la aplicación Flask, incluyendo la conexión al broker MQTT y el manejo de rutas para servir la aplicación Angular.
-- `mqtt_client.py`: Configura el cliente MQTT para recibir datos del ESP32 y guardarlos en la base de datos.
+- `mqtt_client.py`: Configura el cliente MQTT para recibir datos de la Raspberry Cliente y guardarlos en la base de datos.
 - `database.py`: Crea las tablas necesarias en la base de datos SQLite.
 - `models/sensor_data.py`: Define las funciones para interactuar con la tabla de datos del sensor.
 - `models/event.py`: Define las funciones para interactuar con la tabla de eventos.

@@ -1,0 +1,22 @@
+RaspServer:
+  sudo systemctl stop project
+  sudo systemctl disable project
+
+  sudo systemctl enable project
+  sudo systemctl start project
+
+  sudo systemctl status project
+
+  source venv/bin/activate ------ Activar variable de entorno
+
+
+RaspClient:
+  sudo systemctl stop projectClient
+  sudo systemctl disable projectClient
+
+  sudo systemctl enable projectClient
+  sudo systemctl start projectClient
+
+  sudo systemctl status projectClient
+
+  source /home/pi/myenv/bin/activate ------ Activar variable de entorno

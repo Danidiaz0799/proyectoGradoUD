@@ -1,7 +1,7 @@
 import sqlite3
 
 def show_tables():
-    conn = sqlite3.connect('sensor_data.db')
+    conn = sqlite3.connect('/home/stevpi/Desktop/raspServer/sensor_data.db')
     c = conn.cursor()
 
     # Mostrar datos de la tabla dht_data
