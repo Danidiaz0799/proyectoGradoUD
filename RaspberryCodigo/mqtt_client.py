@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from models.sensor_data import save_sensor_data
+from models.sensor_data import save_dht11_data
 from models.event import save_event  # Importar la funcion para guardar eventos
 import time
 
@@ -16,7 +16,7 @@ def on_message(client, userdata, msg):
         if msg.topic == 'sensor/dht11' and len(data) == 2:
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
             print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
-            save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
+            save_dht11_data(temperatura, humedad)  # Guardar datos en la base de datos
             current_time = time.time()
             # Verificar si la temperatura o la humedad estan fuera de los parametros
             if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable

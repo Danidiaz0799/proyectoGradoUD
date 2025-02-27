@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.sensor_data import get_all_sensor_data
+from models.sensor_data import get_all_dht11_data
 
 # Crear un Blueprint para las rutas de sensores
 sensor_bp = Blueprint('sensor_bp', __name__)
@@ -9,5 +9,5 @@ sensor_bp = Blueprint('sensor_bp', __name__)
 def get_dht_sensor_data():
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('pageSize', 10))
-    data = get_all_sensor_data(page, page_size)
+    data = get_all_dht11_data(page, page_size)
     return jsonify([dict(row) for row in data])
