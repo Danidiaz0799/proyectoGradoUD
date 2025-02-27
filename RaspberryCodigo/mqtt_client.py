@@ -41,9 +41,16 @@ def handle_dht11_message(data):
             last_hum_event_time = current_time
 
 def handle_bmp280_message(data):
+    global last_temp_event_time
     temperatura, presion = data[0], data[1]  # Separar temperatura y presion
     print(f'Temperatura: {temperatura}C, Presion: {presion}hPa')  # Imprimir datos en consola
     save_bmp280_data(temperatura, presion)  # Guardar datos en la base de datos
+    current_time = time.time()
+    # Verificar si la temperatura esta fuera de los parametros
+    if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
+        if current_time - last_temp_event_time > 60:
+            save_event(f"Advertencia: Temperatura fuera de rango - {temperatura}", "temperatura")
+            last_temp_event_time = current_time
 
 def handle_gy302_message(data):
     nivel_luz = data[0]  # Nivel de luz
