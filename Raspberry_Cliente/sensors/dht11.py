@@ -5,15 +5,15 @@ import time
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4  # Pin GPIO al que esta conectado el sensor DHT11
 
-def read_sensor():
+def read_dht11():
     humidity, temperature = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
     if humidity is not None and temperature is not None:
         return {'temperature': temperature, 'humidity': humidity}
     else:
         return None
 
-def publish_sensor_data(client, topic):
-    sensor_data = read_sensor()
+def publish_dht11_data(client, topic):
+    sensor_data = read_dht11()
     if sensor_data:
         temp = sensor_data['temperature']
         hum = sensor_data['humidity']

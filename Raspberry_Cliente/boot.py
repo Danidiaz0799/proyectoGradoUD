@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from config.wifi_config import connect_wifi
 from config.mqtt_config import connect_mqtt
-from sensors.dht11 import publish_sensor_data
+from sensors.dht11 import publish_dht11_data
 from actuators.light import control_light
 from actuators.fan import control_fan  # Importar la función para controlar el ventilador
 from sensors.bmp280 import publish_bmp280_data
@@ -31,10 +31,10 @@ def mqtt_loop(client):
         time.sleep(1)  # Esperar 1 segundo antes de verificar nuevamente
 
 # Funcion para publicar datos del sensor DHT11
-def sensor_loop(client):
+def dht11_loop(client):
     while True:
         try:
-            publish_sensor_data(client, config.TOPIC_SENSOR)  # Publicar datos del sensor DHT11
+            publish_dht11_data(client, config.TOPIC_DHT11)  # Publicar datos del sensor DHT11
         except OSError as e:
             print("Error en el loop de sensores DHT11:", str(e)) # Mensaje de error
         time.sleep(5)  # Esperar 5 segundos entre publicaciones
@@ -68,7 +68,7 @@ def main():
             client.subscribe(config.TOPIC_FAN)  # Suscribirse al topico para controlar el ventilador
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
-            threading.Thread(target=sensor_loop, args=(client,)).start()
+            threading.Thread(target=dht11_loop, args=(client,)).start()
             threading.Thread(target=bmp280_loop, args=(client,)).start()  # Iniciar hilo para BMP280
             threading.Thread(target=gy302_loop, args=(client,)).start()  # Iniciar hilo para GY-302
             while True:
