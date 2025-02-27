@@ -13,7 +13,7 @@ def on_message(client, userdata, msg):
     try:
         # Decodificar el mensaje en UTF-8 y manejar errores
         data = msg.payload.decode('utf-8', errors='ignore').split(',')
-        if len(data) == 2:
+        if msg.topic == 'sensor/dht11' and len(data) == 2:
             temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
             print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
             save_sensor_data(temperatura, humedad)  # Guardar datos en la base de datos
@@ -27,6 +27,12 @@ def on_message(client, userdata, msg):
                 if current_time - last_hum_event_time > 60:
                     save_event(f"Advertencia: Humedad fuera de rango - {humedad}", "humedad")
                     last_hum_event_time = current_time
+        elif msg.topic == 'sensor/bmp280' and len(data) == 2:
+            temperatura, presion = data[0], data[1]  # Separar temperatura y presión
+            print(f'Temperatura: {temperatura}C, Presion: {presion}hPa')  # Imprimir datos en consola
+        elif msg.topic == 'sensor/gy302' and len(data) == 1:
+            nivel_luz = data[0]  # Nivel de luz
+            print(f'Nivel de luz: {nivel_luz} lx')  # Imprimir datos en consola
         else:
             print("Datos recibidos en formato incorrecto")
     except Exception as e:
@@ -47,4 +53,6 @@ def connect_mqtt():
     client.on_message = on_message
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
     client.subscribe('sensor/dht11')  # Suscribirse al topico donde el ESP32 publica
+    client.subscribe('sensor/bmp280')  # Suscribirse al topico donde se publican los datos del BMP280
+    client.subscribe('sensor/gy302')  # Suscribirse al topico donde se publican los datos del GY-302
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
