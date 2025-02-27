@@ -41,7 +41,6 @@ def main():
         if client:  # Si se conecta correctamente al broker
             client.on_message = on_message  # Configurar callback de mensajes
             client.subscribe(config.TOPIC_LIGHT)  # Suscribirse al topico para controlar la luz
-            print("Suscrito al topico de control de luz")
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sensor_loop, args=(client,)).start()
