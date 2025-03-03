@@ -2,6 +2,10 @@ RaspServer:
   sudo systemctl stop project
   sudo systemctl disable project
 
+  sudo rm /etc/systemd/system/project.service
+  sudo cp /home/stevpi/Desktop/raspServer/project.service /etc/systemd/system/
+
+  sudo systemctl daemon-reload
   sudo systemctl enable project
   sudo systemctl start project
 
@@ -14,6 +18,7 @@ RaspClient:
   sudo systemctl stop projectClient
   sudo systemctl disable projectClient
 
+  sudo systemctl daemon-reload
   sudo systemctl enable projectClient
   sudo systemctl start projectClient
 

@@ -11,6 +11,20 @@ def show_tables():
     for row in dht_data:
         print(row)
 
+    # Mostrar datos de la tabla bmp280_data
+    c.execute('SELECT * FROM bmp280_data')
+    bmp280_data = c.fetchall()
+    print("\nDatos de la tabla bmp280_data:")
+    for row in bmp280_data:
+        print(row)
+
+    # Mostrar datos de la tabla gy302_data
+    c.execute('SELECT * FROM gy302_data')
+    gy302_data = c.fetchall()
+    print("\nDatos de la tabla gy302_data:")
+    for row in gy302_data:
+        print(row)
+
     # Mostrar datos de la tabla events
     c.execute('SELECT * FROM events')
     events = c.fetchall()
