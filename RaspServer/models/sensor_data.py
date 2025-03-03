@@ -62,3 +62,14 @@ def get_ideal_params(param_type):
                         (param_type,)).fetchone()
     conn.close()
     return params
+
+# Actualizar parametros ideales en la base de datos
+def update_ideal_params(param_type, min_value, max_value):
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE ideal_params
+        SET min_value = ?, max_value = ?, timestamp = ?
+        WHERE param_type = ?
+    ''', (min_value, max_value, datetime.now().isoformat(), param_type))
+    conn.commit()
+    conn.close()
