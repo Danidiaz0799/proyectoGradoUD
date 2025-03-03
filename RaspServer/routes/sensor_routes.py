@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.sensor_data import get_all_dht11_data, get_all_bmp280_data, get_all_gy302_data
+from models.sensor_data import get_all_dht11_data, get_all_bmp280_data, get_all_gy302_data, get_ideal_params
 
 # Crear un Blueprint para las rutas de sensores
 sensor_bp = Blueprint('sensor_bp', __name__)
@@ -27,3 +27,12 @@ def get_gy302_sensor_data():
     page_size = int(request.args.get('pageSize', 10))
     data = get_all_gy302_data(page, page_size)
     return jsonify([dict(row) for row in data])
+
+# API para obtener parametros ideales
+@sensor_bp.route('/IdealParams/<param_type>', methods=['GET'])
+def get_ideal_params_data(param_type):
+    params = get_ideal_params(param_type)
+    if params:
+        return jsonify(dict(params))
+    else:
+        return jsonify({"message": "Parametros no encontrados"}), 404

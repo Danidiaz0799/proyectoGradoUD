@@ -59,6 +59,35 @@ def create_tables():
     ''')
     print("Tabla actuators creada o ya existe.")
 
+    # Crear tabla para parametros ideales
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS ideal_params (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            param_type TEXT NOT NULL,
+            min_value REAL NOT NULL,
+            max_value REAL NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+    ''')
+    print("Tabla ideal_params creada o ya existe.")
+
+    # Insertar parametros ideales predeterminados para temperatura y humedad
+    c.execute('SELECT COUNT(*) FROM ideal_params WHERE param_type = "temperatura"')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO ideal_params (param_type, min_value, max_value, timestamp)
+            VALUES ('temperatura', 15, 30, datetime('now'))
+        ''')
+        print("Parametros ideales para 'temperatura' insertados.")
+
+    c.execute('SELECT COUNT(*) FROM ideal_params WHERE param_type = "humedad"')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO ideal_params (param_type, min_value, max_value, timestamp)
+            VALUES ('humedad', 30, 100, datetime('now'))
+        ''')
+        print("Parametros ideales para 'humedad' insertados.")
+
     # Verificar si los actuadores predeterminados ya existen
     c.execute('SELECT COUNT(*) FROM actuators WHERE name = "Iluminacion"')
     if c.fetchone()[0] == 0:

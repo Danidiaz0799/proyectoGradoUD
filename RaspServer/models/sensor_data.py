@@ -54,3 +54,11 @@ def get_all_gy302_data(page, page_size):
                         (page_size, (page - 1) * page_size)).fetchall()
     conn.close()
     return data
+
+# Obtener parametros ideales desde la base de datos
+def get_ideal_params(param_type):
+    conn = get_db_connection()
+    params = conn.execute('SELECT * FROM ideal_params WHERE param_type = ? ORDER BY timestamp DESC LIMIT 1',
+                        (param_type,)).fetchone()
+    conn.close()
+    return params
