@@ -55,6 +55,22 @@ def get_all_gy302_data(page, page_size):
     conn.close()
     return data
 
+# Obtener data de sensores por fecha inicial y fecha final con paginación
+def get_sensor_data_by_date(start_date, end_date, page, page_size):
+    conn = get_db_connection()
+    dht_data = conn.execute('SELECT * FROM dht_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
+                            (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
+    bmp280_data = conn.execute('SELECT * FROM bmp280_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
+                               (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
+    gy302_data = conn.execute('SELECT * FROM gy302_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
+                              (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
+    conn.close()
+    return {
+        "dht_data": [dict(row) for row in dht_data],
+        "bmp280_data": [dict(row) for row in bmp280_data],
+        "gy302_data": [dict(row) for row in gy302_data]
+    }
+
 # Obtener parametros ideales desde la base de datos
 def get_ideal_params(param_type):
     conn = get_db_connection()
