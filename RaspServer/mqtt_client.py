@@ -13,7 +13,7 @@ def on_message(client, userdata, msg):
     try:
         # Decodificar el mensaje en UTF-8 y manejar errores
         data = msg.payload.decode('utf-8', errors='ignore').split(',')
-        if msg.topic == 'sensor/dht11' and len(data) == 2:
+        if msg.topic == 'sensor/sht3x' and len(data) == 2:
             handle_dht11_message(data)
         elif msg.topic == 'sensor/bmp280' and len(data) == 2:
             handle_bmp280_message(data)
@@ -33,7 +33,7 @@ def handle_dht11_message(data):
     # Verificar si la temperatura o la humedad estan fuera de los parametros
     if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
         if current_time - last_temp_event_time > 60:
-            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} ° C", "temperatura")
+            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} C", "temperatura")
             last_temp_event_time = current_time
     if not (60 <= float(humedad) <= 90):  # Rango de humedad aceptable
         if current_time - last_hum_event_time > 60:
@@ -49,7 +49,7 @@ def handle_bmp280_message(data):
     # Verificar si la temperatura esta fuera de los parametros
     if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
         if current_time - last_temp_event_time > 60:
-            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} ° C", "temperatura")
+            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} C", "temperatura")
             last_temp_event_time = current_time
 
 def handle_gy302_message(data):
@@ -71,7 +71,7 @@ def connect_mqtt():
     client = mqtt.Client()
     client.on_message = on_message
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
-    client.subscribe('sensor/dht11')  # Suscribirse al topico donde el ESP32 publica
+    client.subscribe('sensor/sht3x')  # Suscribirse al topico donde la Raspberry publica
     client.subscribe('sensor/bmp280')  # Suscribirse al topico donde se publican los datos del BMP280
     client.subscribe('sensor/gy302')  # Suscribirse al topico donde se publican los datos del GY-302
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
