@@ -7,34 +7,18 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Guardar datos del dht11 en la base de datos
-def save_dht11_data(temperature, humidity):
+# Guardar datos del sht3x en la base de datos
+def save_sht3x_data(temperature, humidity):
     conn = get_db_connection()
-    conn.execute('INSERT INTO dht_data (timestamp, temperature, humidity) VALUES (?, ?, ?)',
+    conn.execute('INSERT INTO sht3x_data (timestamp, temperature, humidity) VALUES (?, ?, ?)',
                     (datetime.now().isoformat(), temperature, humidity))
     conn.commit()
     conn.close()
 
-# Obtener todos los datos de dht11 desde la base de datos
-def get_all_dht11_data(page, page_size):
+# Obtener todos los datos de sht3x desde la base de datos
+def get_all_sht3x_data(page, page_size):
     conn = get_db_connection()
-    data = conn.execute('SELECT * FROM dht_data ORDER BY timestamp DESC LIMIT ? OFFSET ?',
-                        (page_size, (page - 1) * page_size)).fetchall()
-    conn.close()
-    return data
-
-# Guardar datos del bmp280 en la base de datos
-def save_bmp280_data(temperature, pressure):
-    conn = get_db_connection()
-    conn.execute('INSERT INTO bmp280_data (timestamp, temperature, pressure) VALUES (?, ?, ?)',
-                    (datetime.now().isoformat(), temperature, pressure))
-    conn.commit()
-    conn.close()
-
-# Obtener todos los datos de bmp280 desde la base de datos
-def get_all_bmp280_data(page, page_size):
-    conn = get_db_connection()
-    data = conn.execute('SELECT * FROM bmp280_data ORDER BY timestamp DESC LIMIT ? OFFSET ?',
+    data = conn.execute('SELECT * FROM sht3x_data ORDER BY timestamp DESC LIMIT ? OFFSET ?',
                         (page_size, (page - 1) * page_size)).fetchall()
     conn.close()
     return data
@@ -58,16 +42,13 @@ def get_all_gy302_data(page, page_size):
 # Obtener data de sensores por fecha inicial y fecha final con paginación
 def get_sensor_data_by_date(start_date, end_date, page, page_size):
     conn = get_db_connection()
-    dht_data = conn.execute('SELECT * FROM dht_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
+    sht3x_data = conn.execute('SELECT * FROM sht3x_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
                             (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
-    bmp280_data = conn.execute('SELECT * FROM bmp280_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
-                               (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
     gy302_data = conn.execute('SELECT * FROM gy302_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
                               (start_date, end_date, page_size, (page - 1) * page_size)).fetchall()
     conn.close()
     return {
-        "dht_data": [dict(row) for row in dht_data],
-        "bmp280_data": [dict(row) for row in bmp280_data],
+        "sht3x_data": [dict(row) for row in sht3x_data],
         "gy302_data": [dict(row) for row in gy302_data]
     }
 

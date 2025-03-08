@@ -12,12 +12,12 @@ Este proyecto tiene como objetivo desarrollar una aplicación innovadora que res
 
 ## Código de la Raspberry Cliente
 
-El código de la Raspberry Cliente está diseñado para leer datos de un sensor DHT11 y publicarlos en un broker MQTT. A continuación se describen los archivos principales:
+El código de la Raspberry Cliente está diseñado para leer datos de un sensor sht3x y publicarlos en un broker MQTT. A continuación se describen los archivos principales:
 
 - `boot.py`: Contiene la función principal que gestiona la conexión Wi-Fi, la conexión al broker MQTT y la publicación de datos del sensor.
 - `config/wifi_config.py`: Configura y maneja la conexión Wi-Fi.
 - `config/mqtt_config.py`: Configura y maneja la conexión al broker MQTT.
-- `sensors/sensor_config.py`: Configura el sensor DHT11 y define la función para publicar los datos del sensor.
+- `sensors/sensor_config.py`: Configura el sensor sht3x y define la función para publicar los datos del sensor.
 - `config/config.py`: Contiene las configuraciones generales como las credenciales Wi-Fi y los detalles del broker MQTT.
 
 ## Código de la Raspberry Pi
