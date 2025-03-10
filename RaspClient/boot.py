@@ -3,6 +3,8 @@ from config.wifi_config import connect_wifi
 from config.mqtt_config import connect_mqtt
 from actuators.light import control_light
 from actuators.fan import control_fan  # Importar la funcion para controlar el ventilador
+from actuators.humidifier import control_humidifier  # Importar la funcion para controlar el humidificador
+from actuators.motor import control_motor  # Importar la funcion para controlar el motor
 from sensors.gy302 import publish_gy302_data
 from sensors.sht3x import publish_sht3x_data  # Importar la funcion para publicar datos del sensor SHT3x
 from config import config
@@ -18,6 +20,12 @@ def on_message(client, userdata, message):  # Modificar para aceptar los argumen
     elif message.topic == config.TOPIC_FAN:  # Manejar el topico del ventilador
         state = message.payload.decode('utf-8')
         control_fan(state)
+    elif message.topic == config.TOPIC_HUMIDIFIER:  # Manejar el topico del humidificador
+        state = message.payload.decode('utf-8')
+        control_humidifier(state)
+    elif message.topic == config.TOPIC_MOTOR:  # Manejar el topico del motor
+        state = message.payload.decode('utf-8')
+        control_motor(state)
 
 # Funcion para manejar la conexion MQTT y recibir mensajes
 def mqtt_loop(client):
@@ -56,6 +64,8 @@ def main():
             client.on_message = on_message  # Configurar callback de mensajes
             client.subscribe(config.TOPIC_LIGHT)  # Suscribirse al topico para controlar la luz
             client.subscribe(config.TOPIC_FAN)  # Suscribirse al topico para controlar el ventilador
+            client.subscribe(config.TOPIC_HUMIDIFIER)  # Suscribirse al topico para controlar el humidificador
+            client.subscribe(config.TOPIC_MOTOR)  # Suscribirse al topico para controlar el motor
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sht3x_loop, args=(client,)).start()  # Iniciar hilo para SHT3x

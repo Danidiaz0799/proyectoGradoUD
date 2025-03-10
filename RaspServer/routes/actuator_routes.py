@@ -31,6 +31,32 @@ def toggle_fan():
     else:
         return jsonify({"error": "Datos incompletos"}), 400
 
+# API para encender/apagar el humidificador del Raspberry
+@actuator_bp.route('/Actuator/toggle_humidifier', methods=['POST'])
+def toggle_humidifier():
+    data = request.get_json()
+    state = data.get('state')
+    if state is not None:
+        publish_message('raspberry/humidifier', str(state).lower())
+        save_event(f"Actuador Humidificador cambiado a {state}", "humidificador")  # Guardar evento
+        update_actuator_state(3, state)
+        return jsonify({"message": "Senal enviada correctamente"}), 200
+    else:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+# API para encender/apagar el motor del Raspberry
+@actuator_bp.route('/Actuator/toggle_motor', methods=['POST'])
+def toggle_motor():
+    data = request.get_json()
+    state = data.get('state')
+    if state is not None:
+        publish_message('raspberry/motor', str(state).lower())
+        save_event(f"Actuador Motor cambiado a {state}", "motor")  # Guardar evento
+        update_actuator_state(4, state)
+        return jsonify({"message": "Senal enviada correctamente"}), 200
+    else:
+        return jsonify({"error": "Datos incompletos"}), 400
+
 # API para obtener actuadores desde la base de datos
 @actuator_bp.route('/Actuator', methods=['GET'])
 def get_actuators():

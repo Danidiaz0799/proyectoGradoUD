@@ -94,6 +94,22 @@ def create_tables():
         ''')
         print("Actuador 'Ventilacion' insertado.")
 
+    c.execute('SELECT COUNT(*) FROM actuators WHERE name = "Humidificador"')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO actuators (name, state, timestamp)
+            VALUES ('Humidificador', 0, datetime('now'))
+        ''')
+        print("Actuador 'Humidificador' insertado.")
+
+    c.execute('SELECT COUNT(*) FROM actuators WHERE name = "Motor"')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO actuators (name, state, timestamp)
+            VALUES ('Motor', 0, datetime('now'))
+        ''')
+        print("Actuador 'Motor' insertado.")
+
     conn.commit()
     conn.close()
     print("Base de datos creada y tablas inicializadas.")
