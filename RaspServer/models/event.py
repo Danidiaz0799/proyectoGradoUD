@@ -33,3 +33,10 @@ def update_event(id, message, topic):
                     (message, datetime.now().isoformat(), topic, id))
     conn.commit()
     conn.close()
+
+# Eliminar un evento en la base de datos
+def delete_event(id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM events WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
