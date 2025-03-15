@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from mqtt_client import publish_message
-from models.event import save_event  # Importar la funcion para guardar eventos
 from models.actuator import save_actuator_state, update_actuator_state, get_all_actuators
 
 actuator_bp = Blueprint('actuator_bp', __name__)
@@ -12,7 +11,6 @@ def toggle_light():
     state = data.get('state')
     if state is not None:
         publish_message('raspberry/light', str(state).lower())
-        save_event(f"Actuador Iluminacion cambiado a {state}", "iluminacion")  # Guardar evento
         update_actuator_state(1, state)  # Actualizar estado del actuador en la base de datos
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -25,7 +23,6 @@ def toggle_fan():
     state = data.get('state')
     if state is not None:
         publish_message('raspberry/fan', str(state).lower())
-        save_event(f"Actuador Ventilador cambiado a {state}", "ventilador")  # Guardar evento
         update_actuator_state(2, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -38,7 +35,6 @@ def toggle_humidifier():
     state = data.get('state')
     if state is not None:
         publish_message('raspberry/humidifier', str(state).lower())
-        save_event(f"Actuador Humidificador cambiado a {state}", "humidificador")  # Guardar evento
         update_actuator_state(3, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -51,7 +47,6 @@ def toggle_motor():
     state = data.get('state')
     if state is not None:
         publish_message('raspberry/motor', str(state).lower())
-        save_event(f"Actuador Motor cambiado a {state}", "motor")  # Guardar evento
         update_actuator_state(4, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
