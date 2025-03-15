@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.event import save_event, get_all_events, update_event, get_events_by_topic
+from models.event import save_event, get_all_events, update_event, get_events_by_topic, delete_event  # Importar la función para eliminar eventos
 
 event_bp = Blueprint('event_bp', __name__)
 
@@ -34,3 +34,12 @@ def get_events_by_topic_endpoint():
         return jsonify([dict(row) for row in data])
     else:
         return jsonify({"error": "El tema es requerido"}), 400
+
+# API para eliminar un evento por ID
+@event_bp.route('/Event/<int:id>', methods=['DELETE'])
+def delete_event_endpoint(id):
+    try:
+        delete_event(id)
+        return jsonify({"message": "Evento eliminado correctamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
