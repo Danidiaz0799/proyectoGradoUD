@@ -60,6 +60,16 @@ def create_tables():
     ''')
     print("Tabla ideal_params creada o ya existe.")
 
+    # Crear tabla para el estado de la aplicacion
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS app_state (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mode TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+    ''')
+    print("Tabla app_state creada o ya existe.")
+
     # Insertar parametros ideales predeterminados para temperatura y humedad
     c.execute('SELECT COUNT(*) FROM ideal_params WHERE param_type = "temperatura"')
     if c.fetchone()[0] == 0:
@@ -109,6 +119,15 @@ def create_tables():
             VALUES ('Motor', 0, datetime('now'))
         ''')
         print("Actuador 'Motor' insertado.")
+
+    # Insertar estado inicial de la aplicacion si no existe
+    c.execute('SELECT COUNT(*) FROM app_state')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO app_state (mode, timestamp)
+            VALUES ('automatico', datetime('now'))
+        ''')
+        print("Estado inicial de la aplicacion insertado.")
 
     conn.commit()
     conn.close()
