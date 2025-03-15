@@ -87,7 +87,7 @@ def get_ideal_params_data(param_type):
         return jsonify({"message": "Parametros no encontrados"}), 404
 
 # API para actualizar parametros ideales
-@sensor_bp.route('/IdealParams/<param_type>', methods['PUT'])
+@sensor_bp.route('/IdealParams/<param_type>', methods=['PUT'])
 def update_ideal_params_data(param_type):
     data = request.json
     min_value = data.get('min_value')
