@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import time
 
 # Conectar a la base de datos
 def get_db_connection():
@@ -7,13 +8,39 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def execute_query_with_retry(query, params=(), retries=5, delay=1):
+    for attempt in range(retries):
+        try:
+            conn = get_db_connection()
+            result = conn.execute(query, params).fetchall()
+            conn.commit()
+            conn.close()
+            return result
+        except sqlite3.OperationalError as e:
+            if "database is locked" in str(e) and attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                raise
+
+def execute_write_query_with_retry(query, params=(), retries=5, delay=1):
+    for attempt in range(retries):
+        try:
+            conn = get_db_connection()
+            conn.execute(query, params)
+            conn.commit()
+            conn.close()
+            return
+        except sqlite3.OperationalError as e:
+            if "database is locked" in str(e) and attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                raise
+
 # Guardar datos del sht3x en la base de datos
 def save_sht3x_data(temperature, humidity):
-    conn = get_db_connection()
-    conn.execute('INSERT INTO sht3x_data (timestamp, temperature, humidity) VALUES (?, ?, ?)',
-                    (datetime.now().isoformat(), temperature, humidity))
-    conn.commit()
-    conn.close()
+    query = 'INSERT INTO sht3x_data (timestamp, temperature, humidity) VALUES (?, ?, ?)'
+    params = (datetime.now().isoformat(), temperature, humidity)
+    execute_write_query_with_retry(query, params)
 
 # Obtener todos los datos de sht3x desde la base de datos
 def get_all_sht3x_data(page, page_size):
@@ -25,11 +52,9 @@ def get_all_sht3x_data(page, page_size):
 
 # Guardar datos del gy302 en la base de datos
 def save_gy302_data(light_level):
-    conn = get_db_connection()
-    conn.execute('INSERT INTO gy302_data (timestamp, light_level) VALUES (?, ?)',
-                    (datetime.now().isoformat(), light_level))
-    conn.commit()
-    conn.close()
+    query = 'INSERT INTO gy302_data (timestamp, light_level) VALUES (?, ?)'
+    params = (datetime.now().isoformat(), light_level)
+    execute_write_query_with_retry(query, params)
 
 # Obtener todos los datos de gy302 desde la base de datos
 def get_all_gy302_data(page, page_size):
@@ -54,19 +79,17 @@ def get_sensor_data_by_date(start_date, end_date, page, page_size):
 
 # Obtener parametros ideales desde la base de datos
 def get_ideal_params(param_type):
-    conn = get_db_connection()
-    params = conn.execute('SELECT * FROM ideal_params WHERE param_type = ? ORDER BY timestamp DESC LIMIT 1',
-                        (param_type,)).fetchone()
-    conn.close()
-    return params
+    query = 'SELECT * FROM ideal_params WHERE param_type = ? ORDER BY timestamp DESC LIMIT 1'
+    params = (param_type,)
+    result = execute_query_with_retry(query, params)
+    return result[0] if result else None
 
 # Actualizar parametros ideales en la base de datos
 def update_ideal_params(param_type, min_value, max_value):
-    conn = get_db_connection()
-    conn.execute('''
+    query = '''
         UPDATE ideal_params
         SET min_value = ?, max_value = ?, timestamp = ?
         WHERE param_type = ?
-    ''', (min_value, max_value, datetime.now().isoformat(), param_type))
-    conn.commit()
-    conn.close()
+    '''
+    params = (min_value, max_value, datetime.now().isoformat(), param_type)
+    execute_write_query_with_retry(query, params)
