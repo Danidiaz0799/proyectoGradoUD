@@ -2,6 +2,7 @@ import time
 import board
 import busio
 import adafruit_sht31d
+from actuators.oled import display_data  # Importar la funcion para mostrar datos en la pantalla OLED
 
 # Configuracion del sensor SHT3x
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -20,5 +21,6 @@ def publish_sht3x_data(client, topic):
         message = '{0},{1}'.format(temperature, humidity).encode('utf-8')
         client.publish(topic, message)
         print("Datos SHT3x publicados:", message, "en el topico:", topic)
+        display_data(temperature, humidity)  # Mostrar datos en la pantalla OLED
     else:
         print("Error al leer los datos del sensor SHT3x")
