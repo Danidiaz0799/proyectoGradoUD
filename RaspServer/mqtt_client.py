@@ -1,7 +1,9 @@
 import paho.mqtt.client as mqtt
-from models.sensor_data import save_sht3x_data, save_gy302_data
-from models.event import save_event  # Importar la funcion para guardar eventos
+from models.sensor_data import save_sht3x_data, save_gy302_data, get_ideal_params
+from models.event import save_event
 import time
+from models.actuator import update_actuator_state, get_actuator_state
+from models.app_state import get_app_state  # Importar la función para obtener el estado de la aplicación
 
 client = None
 last_temp_event_time = 0
@@ -24,19 +26,81 @@ def on_message(client, userdata, msg):
 
 def handle_sht3x_message(data):
     global last_temp_event_time, last_hum_event_time
-    temperatura, humedad = data[0], data[1]  # Separar temperatura y humedad
+    temperatura, humedad = float(data[0]), float(data[1])  # Separar y convertir temperatura y humedad a float
     print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
     save_sht3x_data(temperatura, humedad)  # Guardar datos en la base de datos
     current_time = time.time()
+
+    # Obtener parametros ideales
+    ideal_temp_params = get_ideal_params('temperatura')
+    ideal_humidity_params = get_ideal_params('humedad')
+
+    if not ideal_temp_params or not ideal_humidity_params:
+        print("No se encontraron parametros ideales")
+        return
+
+    min_temp = ideal_temp_params['min_value']
+    max_temp = ideal_temp_params['max_value']
+    min_humidity = ideal_humidity_params['min_value']
+    max_humidity = ideal_humidity_params['max_value']
+
     # Verificar si la temperatura o la humedad estan fuera de los parametros
-    if not (20 <= float(temperatura) <= 30):  # Rango de temperatura aceptable
+    if not (min_temp <= temperatura <= max_temp):  # Rango de temperatura aceptable
         if current_time - last_temp_event_time > 60:
-            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} C", "temperatura")
+            save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} C (Ideal: {min_temp}-{max_temp} C)", "temperatura")
             last_temp_event_time = current_time
-    if not (60 <= float(humedad) <= 90):  # Rango de humedad aceptable
+    if not (min_humidity <= humedad <= max_humidity):  # Rango de humedad aceptable
         if current_time - last_hum_event_time > 60:
-            save_event(f"Advertencia! Humedad fuera de rango: {humedad} %", "humedad")
+            save_event(f"Advertencia! Humedad fuera de rango: {humedad} % (Ideal: {min_humidity}-{max_humidity} %)", "humedad")
             last_hum_event_time = current_time
+
+    # Verificar el estado de la aplicación
+    app_state = get_app_state()
+    if app_state == 'automatico':
+        update_actuators(temperatura, humedad)
+
+def update_actuators(temperature, humidity):
+    # Obtener parametros ideales
+    ideal_temp_params = get_ideal_params('temperatura')
+    ideal_humidity_params = get_ideal_params('humedad')
+
+    if not ideal_temp_params or not ideal_humidity_params:
+        print("No se encontraron parametros ideales")
+        return
+
+    min_temp = ideal_temp_params['min_value']
+    max_temp = ideal_temp_params['max_value']
+    min_humidity = ideal_humidity_params['min_value']
+    max_humidity = ideal_humidity_params['max_value']
+
+    # Validar temperatura
+    if temperature < min_temp:
+        update_actuator_and_log(1, 'true', "Temperatura baja", 'raspberry/light')
+        update_actuator_and_log(2, 'false', "Ventilador apagado", 'raspberry/fan')
+    elif temperature > max_temp:
+        update_actuator_and_log(1, 'false', "Temperatura alta", 'raspberry/light')
+        update_actuator_and_log(2, 'true', "Ventilador encendido", 'raspberry/fan')
+    else:
+        update_actuator_and_log(1, 'false', "Temperatura normal", 'raspberry/light')
+        update_actuator_and_log(2, 'false', "Ventilador apagado", 'raspberry/fan')
+
+    # Validar humedad
+    if humidity < min_humidity:
+        update_actuator_and_log(3, 'true', "Humedad baja", 'raspberry/humidifier')
+        update_actuator_and_log(4, 'false', "Motor apagado", 'raspberry/motor')
+    elif humidity > max_humidity:
+        update_actuator_and_log(3, 'false', "Humedad alta", 'raspberry/humidifier')
+        update_actuator_and_log(4, 'true', "Motor encendido", 'raspberry/motor')
+    else:
+        update_actuator_and_log(3, 'false', "Humedad normal", 'raspberry/humidifier')
+        update_actuator_and_log(4, 'false', "Motor apagado", 'raspberry/motor')
+
+def update_actuator_and_log(actuator_id, state, description, topic):
+    current_state = get_actuator_state(actuator_id)
+    if current_state != state:
+        update_actuator_state(actuator_id, state)
+        publish_message(topic, str(state).lower())
+        print(f'{description}: {state}')
 
 def handle_gy302_message(data):
     nivel_luz = data[0]  # Nivel de luz
