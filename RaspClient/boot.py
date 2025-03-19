@@ -8,7 +8,7 @@ from actuators.motor import control_motor  # Importar la funcion para controlar 
 from sensors.gy302 import publish_gy302_data
 from sensors.sht3x import publish_sht3x_data  # Importar la funcion para publicar datos del sensor SHT3x
 from config import config
-from actuators.oled import display_data, display_message  # Importar las funciones para mostrar datos y mensajes en la pantalla OLED
+from actuators.oled import display_message  # Importar las funciones para mostrar datos y mensajes en la pantalla OLED
 import time
 import threading
 
@@ -61,7 +61,7 @@ def main():
     # Intentar conectarse al Wi-Fi
     display_message("Conectando a Wi-Fi...")
     if connect_wifi(): # Si se conecta correctamente al Wi-Fi
-        display_message("Conectado a Wi-Fi")
+        display_message("Wi-Fi Conectado")
         client = connect_mqtt()  # Intentar conectar al broker MQTT
         if client:  # Si se conecta correctamente al broker
             display_message("Conectado a MQTT")
