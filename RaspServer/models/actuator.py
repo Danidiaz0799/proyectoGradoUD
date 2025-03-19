@@ -24,3 +24,10 @@ def get_all_actuators():
     data = conn.execute('SELECT * FROM actuators').fetchall()
     conn.close()
     return data
+
+# Obtener el estado de un actuador específico desde la base de datos
+def get_actuator_state(id):
+    conn = get_db_connection()
+    state = conn.execute('SELECT state FROM actuators WHERE id = ?', (id,)).fetchone()
+    conn.close()
+    return state['state'] if state else None
