@@ -77,5 +77,5 @@ La API proporciona los siguientes endpoints para interactuar con los datos:
 - **Procesamiento y Almacenamiento**: La Raspberry Pi Servidor recibe los datos, los almacena en una base de datos y los expone mediante una API.
 - **Visualización y Control**: Un cliente web desarrollado en Angular permite visualizar los datos y controlar los actuadores en tiempo real.
 
-Este proyecto sigue las mejores prácticas de desarrollo de software y está diseñado para ser fácilmente escalable y adaptable a diferentes entornos de monitoreo.
+Este proyecto sigue las mejores prácticas de desarrollo de software y está diseñado para ser fácilmente escalable y adaptable a diferentes entornos de monitoreo. Importante
 
