@@ -56,14 +56,6 @@ def sht3x_loop(client):
             print("Error en el loop de sensores SHT3x:", str(e))  # Mensaje de error
         time.sleep(5)  # Esperar 5 segundos entre publicaciones
 
-# Funcion para verificar la conexion Wi-Fi y reconectar si es necesario
-def wifi_loop():
-    while True:
-        if not connect_wifi():
-            print("Desconectado de la red Wi-Fi. Intentando reconectar...")
-            display_message("Reconectando a Wi-Fi...")
-        time.sleep(20)  # Verificar cada 10 segundos
-
 # Funcion principal del programa
 def main():
     # Intentar conectarse al Wi-Fi
@@ -78,10 +70,9 @@ def main():
             client.subscribe(config.TOPIC_FAN)  # Suscribirse al topico para controlar el ventilador
             client.subscribe(config.TOPIC_HUMIDIFIER)  # Suscribirse al topico para controlar el humidificador
             client.subscribe(config.TOPIC_MOTOR)  # Suscribirse al topico para controlar el motor
-            # Iniciar hilos para manejar MQTT, sensores y Wi-Fi
+            # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sht3x_loop, args=(client,)).start()  # Iniciar hilo para SHT3x
-            threading.Thread(target=wifi_loop).start()  # Iniciar hilo para verificar la conexion Wi-Fi
             while True:
                 time.sleep(1)  # Mantener el programa principal en ejecucion
         else:

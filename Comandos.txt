@@ -25,3 +25,5 @@ RaspClient:
   sudo systemctl status projectClient
 
   source /home/pi/myenv/bin/activate ------ Activar variable de entorno
+
+  python /home/pi/Desktop/raspClient/boot.py
