@@ -39,4 +39,4 @@ def serve_index():
 # Iniciar la aplicacion
 if __name__ == '__main__':
     connect_mqtt()  # Conectar al broker MQTT
-    app.run(host='0.0.0.0', port=5000)  # Modo produccion sin debug
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)  # Modo produccion sin debug
