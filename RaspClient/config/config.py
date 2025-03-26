@@ -1,9 +1,9 @@
 # Configuracion de la red Wi-Fi
-SSID = 'Claro_00BF1E'  # Nombre de la red Wi-Fi
-PASSWORD = 'Z2N2R2C4D9H3'  # Contrasena de la red Wi-Fi
+SSID = 'Stev7'  # Nombre de la red Wi-Fi
+PASSWORD = 'hola12345'  # Contrasena de la red Wi-Fi
 
 # Configuracion del cliente MQTT
-SERVER = '192.168.20.44'  # IP del servidor MQTT (Raspberry Pi)
+SERVER = '192.168.194.214'  # IP del servidor MQTT (Raspberry Pi)
 TOPIC_FAN = 'raspberry/fan'  # Topico para controlar el ventilador
 TOPIC_LIGHT = 'raspberry/light'  # Topico para controlar la luz
 TOPIC_HUMIDIFIER = 'raspberry/humidifier'  # Topico para controlar el humidificador
