@@ -67,21 +67,6 @@ async def get_all_gy302_data(page, page_size):
     await conn.close()
     return data
 
-# Obtener data de sensores por fecha inicial y fecha final con paginación
-async def get_sensor_data_by_date(start_date, end_date, page, page_size):
-    conn = await get_db_connection()
-    async with conn.execute('SELECT * FROM sht3x_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
-                            (start_date, end_date, page_size, (page - 1) * page_size)) as cursor:
-        sht3x_data = await cursor.fetchall()
-    async with conn.execute('SELECT * FROM gy302_data WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
-                            (start_date, end_date, page_size, (page - 1) * page_size)) as cursor:
-        gy302_data = await cursor.fetchall()
-    await conn.close()
-    return {
-        "sht3x_data": [dict(row) for row in sht3x_data],
-        "gy302_data": [dict(row) for row in gy302_data]
-    }
-
 # Obtener parametros ideales desde la base de datos
 async def get_ideal_params(param_type):
     query = 'SELECT * FROM ideal_params WHERE param_type = ? ORDER BY timestamp DESC LIMIT 1'

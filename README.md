@@ -155,7 +155,6 @@ El servidor expone una API REST completa para interactuar con el sistema:
 ### Sensores
 - `GET /api/Sht3xSensor` - Datos de temperatura/humedad (paginados)
 - `GET /api/Gy302Sensor` - Datos de luz (paginados)
-- `GET /api/SensorData?start=<fecha>&end=<fecha>` - Filtrado por fechas
 
 ### Actuadores
 - `GET /api/Actuator` - Estado de todos los actuadores
