@@ -5,9 +5,9 @@ app_state_bp = Blueprint('app_state_bp', __name__)
 
 # API para obtener el estado de la aplicación
 @app_state_bp.route('/getState', methods=['GET'])
-def get_app_state_endpoint():
+async def get_app_state_endpoint():
     try:
-        state = get_app_state()
+        state = await get_app_state()
         if state:
             return jsonify({"mode": state}), 200
         else:
@@ -17,12 +17,12 @@ def get_app_state_endpoint():
 
 # API para actualizar el estado de la aplicación
 @app_state_bp.route('/updateState', methods=['PUT'])
-def update_app_state_endpoint():
+async def update_app_state_endpoint():
     try:
         data = request.json
         mode = data.get('mode')
         if mode in ['manual', 'automatico']:
-            update_app_state(mode)
+            await update_app_state(mode)
             return jsonify({"message": "Estado de la aplicacion actualizado exitosamente"}), 200
         else:
             return jsonify({"error": "Modo invalido"}), 400

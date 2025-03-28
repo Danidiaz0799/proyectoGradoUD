@@ -1,81 +1,196 @@
-# Proyecto de Grado - Universidad Distrital
+# 🌱 Sistema de Monitoreo Ambiental IoT - Universidad Distrital
 
-## Descripción
+[![Estado: En desarrollo](https://img.shields.io/badge/Estado-En%20Desarrollo-yellow)]()
+[![Plataforma: Raspberry Pi](https://img.shields.io/badge/Plataforma-Raspberry%20Pi-C51A4A)]()
+[![Lenguaje: Python](https://img.shields.io/badge/Lenguaje-Python-blue)]()
 
-Este proyecto tiene como objetivo desarrollar una aplicación innovadora basada en el Internet de las Cosas (IoT) para la captura, almacenamiento y visualización de datos provenientes de sensores. Se enfoca en proporcionar un sistema eficiente y escalable para el monitoreo remoto en tiempo real.
+## 📋 Índice
 
-El sistema está compuesto por dos principales componentes:
+- [Descripción General](#-descripción-general)
+- [Arquitectura del Sistema](#-arquitectura-del-sistema)
+- [Componentes Principales](#-componentes-principales)
+  - [Raspberry Cliente](#-raspberry-cliente)
+  - [Raspberry Servidor](#-raspberry-servidor)
+- [Flujo de Datos](#-flujo-de-datos)
+- [API REST](#-api-rest)
+- [Instalación y Despliegue](#-instalación-y-despliegue)
+- [Tecnologías Utilizadas](#-tecnologías-utilizadas)
 
-- **Raspberry Cliente**: Se encarga de recopilar datos de sensores ambientales y enviarlos a un broker MQTT para su posterior procesamiento.
-- **Raspberry Pi Servidor**: Recibe los datos de la Raspberry Cliente, los almacena en una base de datos y expone una API para su acceso y control de actuadores. Además, aloja el servidor web que permite la visualización y gestión de los datos en tiempo real.
+## 🎯 Descripción General
 
-## Tecnologías Utilizadas
+Sistema IoT que monitorea y controla condiciones ambientales (temperatura, humedad e iluminación) en tiempo real. Ideal para cultivos, invernaderos y ambientes donde se requiere control preciso de condiciones.
 
-- **Lenguajes de Programación**: Python, Angular, Flask.
-- **Base de Datos**: SQLite.
-- **Protocolos de Comunicación**: MQTT.
-- **Hardware**: Raspberry Pi, sensores SHT3x, sensores GY302, actuadores (humidificador nebulizador de 24V, ventiladores de 5V, motor de 5V, bombilla de 24V).
+**Características principales:**
+- ✅ Monitoreo continuo de temperatura, humedad y luz
+- ✅ Control automático de actuadores basado en parámetros configurables
+- ✅ Interfaz web para visualización de datos históricos y en tiempo real
+- ✅ Sistema de alertas para condiciones fuera de rango
+- ✅ Modos automático y manual para control de actuadores
 
-## Código de la Raspberry Cliente
+## 🏗️ Arquitectura del Sistema
 
-El código de la Raspberry Cliente está diseñado para leer datos de los sensores SHT3x (temperatura y humedad) y GY302 (luz), y publicarlos en un broker MQTT. A continuación, se describen los archivos principales:
+```
+┌─────────────────┐    MQTT    ┌─────────────────┐    HTTP    ┌─────────────────┐
+│  Raspberry Pi   │  ───────►  │  Raspberry Pi   │  ◄─────►  │   Navegador     │
+│    Cliente      │            │    Servidor     │            │     Web         │
+│                 │  ◄───────  │                 │            │                 │
+└────────┬────────┘            └────────┬────────┘            └─────────────────┘
+         │                              │
+    ┌────▼───┐                   ┌─────▼─────┐
+    │Sensores│                   │ Base de   │
+    │  &     │                   │  Datos    │
+    │Actuad. │                   │  SQLite   │
+    └────────┘                   └───────────┘
+```
 
-- `boot.py`: Contiene la función principal que gestiona la conexión Wi-Fi, la conexión al broker MQTT y la publicación de datos de los sensores.
-- `config/wifi_config.py`: Configura y maneja la conexión Wi-Fi.
-- `config/mqtt_config.py`: Configura y maneja la conexión al broker MQTT.
-- `sensors/sensor_config.py`: Configura los sensores SHT3x y GY302 y define las funciones para publicar los datos.
-- `config/config.py`: Contiene las configuraciones generales como las credenciales Wi-Fi y los detalles del broker MQTT.
+1. **Sensores → Cliente**: Captura de datos ambientales
+2. **Cliente → Servidor**: Transmisión mediante protocolo MQTT
+3. **Servidor → Base de Datos**: Almacenamiento para análisis e históricos
+4. **Servidor → Cliente**: Comandos para actuadores basados en condiciones ambientales
+5. **Servidor ↔ Web**: API REST para visualización y control desde interfaz Angular
 
-## Código de la Raspberry Server
+## 🧩 Componentes Principales
 
-El código de la Raspberry Pi está diseñado para recibir los datos publicados por la Raspberry Cliente, almacenarlos en una base de datos y proporcionar una API para acceder a estos datos. A continuación, se describen los archivos principales:
+### 📟 Raspberry Cliente
 
-- `app.py`: Configura y ejecuta la aplicación Flask, incluyendo la conexión al broker MQTT y el manejo de rutas para servir la aplicación Angular. Este servidor web está alojado en la Raspberry Pi Servidor.
-- `mqtt_client.py`: Configura el cliente MQTT para recibir datos de la Raspberry Cliente y guardarlos en la base de datos.
-- `database.py`: Crea las tablas necesarias en la base de datos SQLite.
-- `models/sensor_data.py`: Define las funciones para interactuar con la tabla de datos del sensor.
-- `models/event.py`: Define las funciones para interactuar con la tabla de eventos.
-- `models/actuator.py`: Define las funciones para interactuar con la tabla de actuadores.
-- `routes/sensor_routes.py`: Define las rutas API para obtener y agregar datos de los sensores.
-- `routes/event_routes.py`: Define las rutas API para obtener y agregar eventos.
-- `routes/actuator_routes.py`: Define las rutas API para obtener y agregar estados de actuadores.
-- `routes/ideal_params_routes.py`: Define las rutas API para obtener y actualizar los parámetros ideales.
+Dispositivo que captura datos de sensores y controla actuadores físicos.
 
-## Endpoints de la API
+#### Hardware
+- Sensores SHT3x (temperatura/humedad)
+- Sensores GY302 (luz)
+- Pantalla OLED para visualización local
+- Actuadores: bombilla 24V, ventiladores 5V, humidificador 24V, motor 5V
 
-La API proporciona los siguientes endpoints para interactuar con los datos:
+#### Software
+- **boot.py**: Punto de entrada que inicializa todo el sistema
+- **Sensores**: Módulos para lectura de datos ambientales
+- **Actuadores**: Control de dispositivos físicos
+- **Comunicación**: Cliente MQTT para envío/recepción de datos
 
-### Sensores (routes/sensor_routes.py)
+#### Estructura de Archivos
+```
+RaspClient/
+├── boot.py                 # Inicialización del sistema
+├── projectClient.service   # Configuración systemd 
+├── config/                 # Configuraciones
+│   ├── config.py           # Credenciales y endpoints
+│   ├── mqtt_config.py      # Conexión MQTT
+│   └── wifi_config.py      # Conexión Wi-Fi
+├── sensors/                # Lectura de sensores
+│   ├── sht3x.py            # Sensor temp/humedad
+│   ├── gy302.py            # Sensor de luz
+│   └── bmp280.py           # Sensor presión (no usado)
+└── actuators/              # Control de actuadores
+    ├── light.py            # Bombilla
+    ├── fan.py              # Ventiladores
+    ├── humidifier.py       # Humidificador
+    ├── motor.py            # Motor
+    └── oled.py             # Pantalla
+```
 
-- `GET /api/Sht3xSensor` → Retorna los datos de temperatura y humedad.
-- `GET /api/Gy302Sensor` → Retorna los datos del sensor de luz.
-- `GET /api/SensorData?start=<fecha>&end=<fecha>` → Retorna los datos en un rango de fechas.
-- `POST /api/SensorData` → Agrega nuevos datos de sensores. Recibe un JSON con los datos del sensor.
+### 🖥️ Raspberry Servidor
 
-### Eventos (routes/event_routes.py)
+Dispositivo que procesa datos, ejecuta lógica de control y sirve la aplicación web.
 
-- `GET /api/Event` → Retorna todos los eventos almacenados.
-- `GET /api/Event/FilterByTopic?topic=<nombre>` → Filtra eventos por tema.
-- `POST /api/Event` → Agrega un nuevo evento. Requiere un JSON con los detalles del evento.
+#### Funcionalidades
+- Recepción y almacenamiento de datos
+- Análisis de condiciones ambientales
+- Control automático basado en parámetros configurables
+- Generación de alertas y eventos
+- Servidor web con API REST
 
-### Actuadores (routes/actuator_routes.py)
+#### Estructura de Archivos
+```
+RaspServer/
+├── app.py                  # Aplicación Flask principal
+├── mqtt_client.py          # Cliente MQTT
+├── database.py             # Gestión de base de datos
+├── project.service         # Configuración systemd
+├── models/                 # Modelos de datos
+│   ├── sensor_data.py      # Datos de sensores
+│   ├── event.py            # Eventos y alertas
+│   ├── actuator.py         # Estado de actuadores
+│   └── app_state.py        # Estado del sistema
+└── routes/                 # API endpoints
+    ├── sensor_routes.py    # Rutas para sensores
+    ├── event_routes.py     # Rutas para eventos
+    ├── actuator_routes.py  # Rutas para actuadores
+    └── app_state_routes.py # Rutas para estado
+```
 
-- `GET /api/Actuator` → Retorna el estado de todos los actuadores.
-- `POST /api/Actuator/toggle_light` → Controla la bombilla de 24V.
-- `POST /api/Actuator/toggle_fan` → Controla los ventiladores de 5V.
-- `POST /api/Actuator/toggle_humidifier` → Controla el humidificador nebulizador de 24V.
-- `POST /api/Actuator/toggle_motor` → Controla el motor de 5V.
+## 🔄 Flujo de Datos
 
-### Parámetros Ideales (routes/ideal_params_routes.py)
+1. **Captura** 📊: Los sensores miden condiciones ambientales cada 5 segundos
+   ```
+   SHT3x → Temperatura (°C), Humedad (%)
+   GY302 → Nivel de luz (lx)
+   ```
 
-- `GET /api/IdealParams/{param}` → Obtiene los parámetros ideales.
-- `PUT /api/IdealParams/{param}` → Actualiza los parámetros ideales.
+2. **Transmisión** 📡: Cliente envía datos vía MQTT al servidor
+   ```
+   Tópico 'sensor/sht3x': "23.5,45.2" (temperatura,humedad)
+   Tópico 'sensor/gy302': "850" (nivel de luz)
+   ```
 
-## Arquitectura del Sistema
+3. **Procesamiento** ⚙️: Servidor evalúa datos contra parámetros ideales
+   ```
+   Ideal Temperatura: 15-30°C
+   Ideal Humedad: 30-100%
+   ```
 
-- **Captura de Datos**: La Raspberry Cliente recoge información de sensores y la transmite vía MQTT.
-- **Procesamiento y Almacenamiento**: La Raspberry Pi Servidor recibe los datos, los almacena en una base de datos y los expone mediante una API.
-- **Visualización y Control**: Un cliente web desarrollado en Angular permite visualizar los datos y controlar los actuadores en tiempo real.
+4. **Acción** 🔌: Control automático de actuadores (modo automático)
+   ```
+   Temperatura baja → Luz ON, Ventilador OFF
+   Temperatura alta → Luz OFF, Ventilador ON
+   Humedad baja → Humidificador ON, Motor OFF
+   Humedad alta → Humidificador OFF, Motor ON
+   ```
 
-Este proyecto sigue las mejores prácticas de desarrollo de software y está diseñado para ser fácilmente escalable y adaptable a diferentes entornos de monitoreo. Importante
+5. **Retroalimentación** 🔁: Actuadores modifican el ambiente y el ciclo continúa
+
+## 🌐 API REST
+
+El servidor expone una API REST completa para interactuar con el sistema:
+
+### Sensores
+- `GET /api/Sht3xSensor` - Datos de temperatura/humedad (paginados)
+- `GET /api/Gy302Sensor` - Datos de luz (paginados)
+
+### Actuadores
+- `GET /api/Actuator` - Estado de todos los actuadores
+- `POST /api/Actuator/toggle_light` - Control de iluminación
+- `POST /api/Actuator/toggle_fan` - Control de ventilación
+- `POST /api/Actuator/toggle_humidifier` - Control de humidificador
+- `POST /api/Actuator/toggle_motor` - Control de motor
+
+### Sistema
+- `GET /api/AppState` - Modo actual (automático/manual)
+- `POST /api/AppState` - Cambio de modo
+- `GET /api/Event` - Registro de eventos/alertas
+- `GET /api/IdealParams/{param}` - Parámetros ideales
+- `PUT /api/IdealParams/{param}` - Actualización de parámetros
+
+## 🚀 Instalación y Despliegue
+
+### Raspberry Cliente
+1. Clonar repositorio en la Raspberry Pi cliente
+2. Configurar `config.py` con credenciales Wi-Fi y dirección del servidor
+3. Instalar dependencias: `pip install paho-mqtt adafruit-circuitpython-sht31d adafruit-circuitpython-gy302`
+4. Instalar como servicio: `sudo cp projectClient.service /etc/systemd/system/`
+5. Activar servicio: `sudo systemctl enable projectClient && sudo systemctl start projectClient`
+
+### Raspberry Servidor
+1. Clonar repositorio en la Raspberry Pi servidor
+2. Instalar dependencias: `pip install flask flask-cors paho-mqtt sqlite3 aiosqlite`
+3. Instalar como servicio: `sudo cp project.service /etc/systemd/system/`
+4. Activar servicio: `sudo systemctl enable project && sudo systemctl start project`
+5. Acceder a la interfaz web: `http://<ip-raspberry-servidor>:5000`
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Hardware**: Raspberry Pi, sensores SHT3x, GY302, actuadores varios
+- **Backend**: Python, Flask, SQLite, MQTT (Mosquitto)
+- **Frontend**: Angular
+- **Comunicación**: Protocolo MQTT, API REST
+- **Despliegue**: Servicios systemd
 

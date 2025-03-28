@@ -5,6 +5,7 @@ from routes.sensor_routes import sensor_bp
 from routes.event_routes import event_bp
 from routes.actuator_routes import actuator_bp
 from routes.app_state_routes import app_state_bp
+from routes.statistics_routes import statistics_bp
 from mqtt_client import connect_mqtt
 import os
 
@@ -20,6 +21,7 @@ app.register_blueprint(sensor_bp)
 app.register_blueprint(event_bp)
 app.register_blueprint(actuator_bp)
 app.register_blueprint(app_state_bp)
+app.register_blueprint(statistics_bp)
 
 # Ruta para servir archivos estaticos (JS, CSS, imagenes, etc.)
 @app.route('/<path:filename>')
@@ -39,4 +41,4 @@ def serve_index():
 # Iniciar la aplicacion
 if __name__ == '__main__':
     connect_mqtt()  # Conectar al broker MQTT
-    app.run(host='0.0.0.0', port=5000)  # Modo produccion sin debug
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)  # Modo produccion sin debug
