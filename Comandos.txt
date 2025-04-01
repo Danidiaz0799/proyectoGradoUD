@@ -13,6 +13,9 @@ RaspServer:
 
   source venv/bin/activate ------ Activar variable de entorno
 
+  python3 /home/stevpi/Desktop/raspServer/app.py
+
+
 
 RaspClient:
   sudo systemctl stop projectClient

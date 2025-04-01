@@ -16,9 +16,9 @@ def on_message(client, userdata, msg):
     try:
         # Decodificar el mensaje en UTF-8 y manejar errores
         data = msg.payload.decode('utf-8', errors='ignore').split(',')
-        if msg.topic == 'sensor/sht3x' and len(data) == 2:
+        if msg.topic == 'mushroom1/sensor/sht3x' and len(data) == 2:
             asyncio.run(handle_sht3x_message(data))
-        elif msg.topic == 'sensor/gy302' and len(data) == 1:
+        elif msg.topic == 'mushroom1/sensor/gy302' and len(data) == 1:
             asyncio.run(handle_gy302_message(data))
         else:
             print("Datos recibidos en formato incorrecto")
@@ -76,25 +76,25 @@ async def update_actuators(temperature, humidity):
 
     # Validar temperatura
     if temperature < min_temp:
-        await update_actuator_and_log(1, 'true', "Temperatura baja", 'raspberry/light')
-        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'raspberry/fan')
+        await update_actuator_and_log(1, 'true', "Temperatura baja", 'mushroom1/light')
+        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'mushroom1/fan')
     elif temperature > max_temp:
-        await update_actuator_and_log(1, 'false', "Temperatura alta", 'raspberry/light')
-        await update_actuator_and_log(2, 'true', "Ventilador encendido", 'raspberry/fan')
+        await update_actuator_and_log(1, 'false', "Temperatura alta", 'mushroom1/light')
+        await update_actuator_and_log(2, 'true', "Ventilador encendido", 'mushroom1/fan')
     else:
-        await update_actuator_and_log(1, 'false', "Temperatura normal", 'raspberry/light')
-        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'raspberry/fan')
+        await update_actuator_and_log(1, 'false', "Temperatura normal", 'mushroom1/light')
+        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'mushroom1/fan')
 
     # Validar humedad
     if humidity < min_humidity:
-        await update_actuator_and_log(3, 'true', "Humedad baja", 'raspberry/humidifier')
-        await update_actuator_and_log(4, 'false', "Motor apagado", 'raspberry/motor')
+        await update_actuator_and_log(3, 'true', "Humedad baja", 'mushroom1/humidifier')
+        await update_actuator_and_log(4, 'false', "Motor apagado", 'mushroom1/motor')
     elif humidity > max_humidity:
-        await update_actuator_and_log(3, 'false', "Humedad alta", 'raspberry/humidifier')
-        await update_actuator_and_log(4, 'true', "Motor encendido", 'raspberry/motor')
+        await update_actuator_and_log(3, 'false', "Humedad alta", 'mushroom1/humidifier')
+        await update_actuator_and_log(4, 'true', "Motor encendido", 'mushroom1/motor')
     else:
-        await update_actuator_and_log(3, 'false', "Humedad normal", 'raspberry/humidifier')
-        await update_actuator_and_log(4, 'false', "Motor apagado", 'raspberry/motor')
+        await update_actuator_and_log(3, 'false', "Humedad normal", 'mushroom1/humidifier')
+        await update_actuator_and_log(4, 'false', "Motor apagado", 'mushroom1/motor')
 
 async def update_actuator_and_log(actuator_id, state, description, topic):
     current_state = await get_actuator_state(actuator_id)
@@ -122,6 +122,6 @@ def connect_mqtt():
     client = mqtt.Client()
     client.on_message = on_message
     client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
-    client.subscribe('sensor/sht3x')  # Suscribirse al topico donde la Raspberry publica
-    client.subscribe('sensor/gy302')  # Suscribirse al topico donde se publican los datos del GY-302
+    client.subscribe('mushroom1/sensor/sht3x')  # Suscribirse al topico donde la Raspberry publica
+    client.subscribe('mushroom1/sensor/gy302')  # Suscribirse al topico donde se publican los datos del GY-302
     client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes

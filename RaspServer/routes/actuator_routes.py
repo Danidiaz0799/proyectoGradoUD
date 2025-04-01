@@ -10,7 +10,7 @@ async def toggle_light():
     data = request.get_json()
     state = data.get('state')
     if state is not None:
-        await publish_message('raspberry/light', str(state).lower())
+        await publish_message('mushroom1/light', str(state).lower())
         await update_actuator_state(1, state)  # Actualizar estado del actuador en la base de datos
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -22,7 +22,7 @@ async def toggle_fan():
     data = request.get_json()
     state = data.get('state')
     if state is not None:
-        await publish_message('raspberry/fan', str(state).lower())
+        await publish_message('mushroom1/fan', str(state).lower())
         await update_actuator_state(2, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -34,7 +34,7 @@ async def toggle_humidifier():
     data = request.get_json()
     state = data.get('state')
     if state is not None:
-        await publish_message('raspberry/humidifier', str(state).lower())
+        await publish_message('mushroom1/humidifier', str(state).lower())
         await update_actuator_state(3, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
@@ -46,7 +46,7 @@ async def toggle_motor():
     data = request.get_json()
     state = data.get('state')
     if state is not None:
-        await publish_message('raspberry/motor', str(state).lower())
+        await publish_message('mushroom1/motor', str(state).lower())
         await update_actuator_state(4, state)
         return jsonify({"message": "Senal enviada correctamente"}), 200
     else:
