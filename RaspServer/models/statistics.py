@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from collections import Counter
 from models.sensor_data import execute_query_with_retry
 
-async def get_sht3x_statistics(days=7):
+async def get_sht3x_statistics(client_id, days=7):
     """
     Obtiene estadisticas de temperatura y humedad de los ultimos dias
     Args:
+        client_id: ID del cliente para el que se obtienen las estadisticas
         days: Cantidad de dias hacia atras para analizar (por defecto 7)
     Returns:
         Diccionario con estadisticas de temperatura y humedad
@@ -17,10 +18,10 @@ async def get_sht3x_statistics(days=7):
     query = """
         SELECT temperature, humidity
         FROM sht3x_data
-        WHERE timestamp BETWEEN ? AND ?
+        WHERE client_id = ? AND timestamp BETWEEN ? AND ?
         ORDER BY timestamp DESC
     """
-    params = (start_date.isoformat(), end_date.isoformat())
+    params = (client_id, start_date.isoformat(), end_date.isoformat())
     result = await execute_query_with_retry(query, params)
     if not result:
         return {

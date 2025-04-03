@@ -1,43 +1,74 @@
 import paho.mqtt.client as mqtt
 from models.sensor_data import save_sht3x_data, save_gy302_data, get_ideal_params
 from models.event import save_event
+from models.client import update_client_status, register_client, client_exists
 import time
-from models.actuator import update_actuator_state, get_actuator_state
-from models.app_state import get_app_state  # Importar la función para obtener el estado de la aplicación
+from models.actuator import update_actuator_state, get_actuator_state, get_actuator_by_name
+from models.app_state import get_app_state
 import asyncio
+import re
 
 client = None
-last_temp_event_time = 0
-last_hum_event_time = 0
+client_last_events = {}  # Diccionario para rastrear el último evento por cliente y tipo
+
+# Función para extraer el client_id de un tópico MQTT
+def extract_client_id(topic):
+    # El formato esperado es 'clients/{client_id}/...'
+    match = re.match(r'clients/([^/]+)/', topic)
+    if match:
+        return match.group(1)
+    return None
 
 # Funcion de callback cuando se recibe un mensaje MQTT
 def on_message(client, userdata, msg):
-    global last_temp_event_time, last_hum_event_time
     try:
-        # Decodificar el mensaje en UTF-8 y manejar errores
-        data = msg.payload.decode('utf-8', errors='ignore').split(',')
-        if msg.topic == 'mushroom1/sensor/sht3x' and len(data) == 2:
-            asyncio.run(handle_sht3x_message(data))
-        elif msg.topic == 'mushroom1/sensor/gy302' and len(data) == 1:
-            asyncio.run(handle_gy302_message(data))
+        # Extraer el client_id del tópico
+        client_id = extract_client_id(msg.topic)
+        if not client_id:
+            print(f"No se pudo extraer client_id del topico: {msg.topic}")
+            return
+        
+        # Actualizar estado del cliente
+        asyncio.run(update_client_status(client_id))
+        
+        # Procesar el mensaje según el tópico
+        if msg.topic == f'clients/{client_id}/sensor/sht3x':
+            data = msg.payload.decode('utf-8', errors='ignore').split(',')
+            if len(data) == 2:
+                asyncio.run(handle_sht3x_message(client_id, data))
+        elif msg.topic == f'clients/{client_id}/sensor/gy302':
+            data = msg.payload.decode('utf-8', errors='ignore').split(',')
+            if len(data) == 1:
+                asyncio.run(handle_gy302_message(client_id, data))
+        elif msg.topic == f'clients/{client_id}/register':
+            data = msg.payload.decode('utf-8', errors='ignore').split(',')
+            if len(data) >= 2:
+                name = data[0]
+                description = data[1] if len(data) > 1 else ""
+                asyncio.run(register_client(client_id, name, description))
+                print(f"Cliente {client_id} registrado: {name}")
         else:
-            print("Datos recibidos en formato incorrecto")
+            print(f"Tópico no reconocido: {msg.topic}")
     except Exception as e:
         print(f'Error al procesar el mensaje: {e}')
 
-async def handle_sht3x_message(data):
-    global last_temp_event_time, last_hum_event_time
-    temperatura, humedad = float(data[0]), float(data[1])  # Separar y convertir temperatura y humedad a float
-    print(f'Temperatura: {temperatura}C, Humedad: {humedad}')  # Imprimir datos en consola
-    await save_sht3x_data(temperatura, humedad)  # Guardar datos en la base de datos
+async def handle_sht3x_message(client_id, data):
+    global client_last_events
+    temperatura, humedad = float(data[0]), float(data[1])
+    print(f'Cliente {client_id} - Temperatura: {temperatura}C, Humedad: {humedad}')
+    await save_sht3x_data(client_id, temperatura, humedad)
     current_time = time.time()
 
-    # Obtener parametros ideales
-    ideal_temp_params = await get_ideal_params('temperatura')
-    ideal_humidity_params = await get_ideal_params('humedad')
+    # Inicializar entradas para este cliente si no existen
+    if client_id not in client_last_events:
+        client_last_events[client_id] = {'temp': 0, 'hum': 0}
+
+    # Obtener parametros ideales para este cliente
+    ideal_temp_params = await get_ideal_params(client_id, 'temperatura')
+    ideal_humidity_params = await get_ideal_params(client_id, 'humedad')
 
     if not ideal_temp_params or not ideal_humidity_params:
-        print("No se encontraron parametros ideales")
+        print(f"No se encontraron parametros ideales para cliente {client_id}")
         return
 
     min_temp = ideal_temp_params['min_value']
@@ -45,68 +76,79 @@ async def handle_sht3x_message(data):
     min_humidity = ideal_humidity_params['min_value']
     max_humidity = ideal_humidity_params['max_value']
 
-    # Verificar si la temperatura o la humedad estan fuera de los parametros
-    if not (min_temp <= temperatura <= max_temp):  # Rango de temperatura aceptable
-        if current_time - last_temp_event_time > 60:
-            await save_event(f"Advertencia! Temperatura fuera de rango: {temperatura} C (Ideal: {min_temp}-{max_temp} C)", "temperatura")
-            last_temp_event_time = current_time
-    if not (min_humidity <= humedad <= max_humidity):  # Rango de humedad aceptable
-        if current_time - last_hum_event_time > 60:
-            await save_event(f"Advertencia! Humedad fuera de rango: {humedad} % (Ideal: {min_humidity}-{max_humidity} %)", "humedad")
-            last_hum_event_time = current_time
+    # Verificar si la temperatura o la humedad están fuera de los parámetros
+    if not (min_temp <= temperatura <= max_temp):
+        if current_time - client_last_events[client_id]['temp'] > 60:
+            await save_event(client_id, f"Advertencia! Temperatura fuera de rango: {temperatura} C (Ideal: {min_temp}-{max_temp} C)", "temperatura")
+            client_last_events[client_id]['temp'] = current_time
+    
+    if not (min_humidity <= humedad <= max_humidity):
+        if current_time - client_last_events[client_id]['hum'] > 60:
+            await save_event(client_id, f"Advertencia! Humedad fuera de rango: {humedad} % (Ideal: {min_humidity}-{max_humidity} %)", "humedad")
+            client_last_events[client_id]['hum'] = current_time
 
-    # Verificar el estado de la aplicación
-    app_state = await get_app_state()
+    # Verificar el estado de la aplicación para este cliente
+    app_state = await get_app_state(client_id)
     if app_state == 'automatico':
-        await update_actuators(temperatura, humedad)
+        await update_actuators(client_id, temperatura, humedad)
 
-async def update_actuators(temperature, humidity):
-    # Obtener parametros ideales
-    ideal_temp_params = await get_ideal_params('temperatura')
-    ideal_humidity_params = await get_ideal_params('humedad')
+async def update_actuators(client_id, temperature, humidity):
+    # Obtener parametros ideales para este cliente
+    ideal_temp_params = await get_ideal_params(client_id, 'temperatura')
+    ideal_humidity_params = await get_ideal_params(client_id, 'humedad')
 
     if not ideal_temp_params or not ideal_humidity_params:
-        print("No se encontraron parametros ideales")
+        print(f"No se encontraron parametros ideales para cliente {client_id}")
         return
 
     min_temp = ideal_temp_params['min_value']
     max_temp = ideal_temp_params['max_value']
     min_humidity = ideal_humidity_params['min_value']
     max_humidity = ideal_humidity_params['max_value']
+
+    # Obtener actuadores por nombre para este cliente
+    light_actuator = await get_actuator_by_name(client_id, "Iluminacion")
+    fan_actuator = await get_actuator_by_name(client_id, "Ventilacion")
+    humidifier_actuator = await get_actuator_by_name(client_id, "Humidificador")
+    motor_actuator = await get_actuator_by_name(client_id, "Motor")
+    
+    if not all([light_actuator, fan_actuator, humidifier_actuator, motor_actuator]):
+        print(f"No se encontraron todos los actuadores para cliente {client_id}")
+        return
 
     # Validar temperatura
     if temperature < min_temp:
-        await update_actuator_and_log(1, 'true', "Temperatura baja", 'mushroom1/light')
-        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'mushroom1/fan')
+        await update_actuator_and_log(client_id, light_actuator['id'], 'true', "Temperatura baja", f'clients/{client_id}/light')
+        await update_actuator_and_log(client_id, fan_actuator['id'], 'false', "Ventilador apagado", f'clients/{client_id}/fan')
     elif temperature > max_temp:
-        await update_actuator_and_log(1, 'false', "Temperatura alta", 'mushroom1/light')
-        await update_actuator_and_log(2, 'true', "Ventilador encendido", 'mushroom1/fan')
+        await update_actuator_and_log(client_id, light_actuator['id'], 'false', "Temperatura alta", f'clients/{client_id}/light')
+        await update_actuator_and_log(client_id, fan_actuator['id'], 'true', "Ventilador encendido", f'clients/{client_id}/fan')
     else:
-        await update_actuator_and_log(1, 'false', "Temperatura normal", 'mushroom1/light')
-        await update_actuator_and_log(2, 'false', "Ventilador apagado", 'mushroom1/fan')
+        await update_actuator_and_log(client_id, light_actuator['id'], 'false', "Temperatura normal", f'clients/{client_id}/light')
+        await update_actuator_and_log(client_id, fan_actuator['id'], 'false', "Ventilador apagado", f'clients/{client_id}/fan')
 
     # Validar humedad
     if humidity < min_humidity:
-        await update_actuator_and_log(3, 'true', "Humedad baja", 'mushroom1/humidifier')
-        await update_actuator_and_log(4, 'false', "Motor apagado", 'mushroom1/motor')
+        await update_actuator_and_log(client_id, humidifier_actuator['id'], 'true', "Humedad baja", f'clients/{client_id}/humidifier')
+        await update_actuator_and_log(client_id, motor_actuator['id'], 'false', "Motor apagado", f'clients/{client_id}/motor')
     elif humidity > max_humidity:
-        await update_actuator_and_log(3, 'false', "Humedad alta", 'mushroom1/humidifier')
-        await update_actuator_and_log(4, 'true', "Motor encendido", 'mushroom1/motor')
+        await update_actuator_and_log(client_id, humidifier_actuator['id'], 'false', "Humedad alta", f'clients/{client_id}/humidifier')
+        await update_actuator_and_log(client_id, motor_actuator['id'], 'true', "Motor encendido", f'clients/{client_id}/motor')
     else:
-        await update_actuator_and_log(3, 'false', "Humedad normal", 'mushroom1/humidifier')
-        await update_actuator_and_log(4, 'false', "Motor apagado", 'mushroom1/motor')
+        await update_actuator_and_log(client_id, humidifier_actuator['id'], 'false', "Humedad normal", f'clients/{client_id}/humidifier')
+        await update_actuator_and_log(client_id, motor_actuator['id'], 'false', "Motor apagado", f'clients/{client_id}/motor')
 
-async def update_actuator_and_log(actuator_id, state, description, topic):
-    current_state = await get_actuator_state(actuator_id)
+async def update_actuator_and_log(client_id, actuator_id, state, description, topic):
+    current_state = await get_actuator_state(client_id, actuator_id)
     if current_state != state:
-        await update_actuator_state(actuator_id, state)
+        await update_actuator_state(client_id, actuator_id, state)
         await publish_message(topic, str(state).lower())
-        print(f'{description}: {state}')
+        print(f'Cliente {client_id} - {description}: {state}')
 
-async def handle_gy302_message(data):
-    nivel_luz = data[0]  # Nivel de luz
-    print(f'Nivel de luz: {nivel_luz} lx')  # Imprimir datos en consola
-    await save_gy302_data(nivel_luz)  # Guardar datos en la base de datos
+async def handle_gy302_message(client_id, data):
+    nivel_luz = data[0]
+    print(f'Cliente {client_id} - Nivel de luz: {nivel_luz} lx')
+    await save_gy302_data(client_id, nivel_luz)
 
 # Funcion para publicar mensajes MQTT
 async def publish_message(topic, message):
@@ -114,14 +156,19 @@ async def publish_message(topic, message):
     if client:
         client.publish(topic, message)
     else:
-        print("Cliente MQTT no esta conectado")
+        print("Cliente MQTT no está conectado")
 
 # Configuracion del cliente MQTT
 def connect_mqtt():
     global client
     client = mqtt.Client()
     client.on_message = on_message
-    client.connect('localhost', 1883, 60)  # Conectarse al broker local de la Raspberry
-    client.subscribe('mushroom1/sensor/sht3x')  # Suscribirse al topico donde la Raspberry publica
-    client.subscribe('mushroom1/sensor/gy302')  # Suscribirse al topico donde se publican los datos del GY-302
-    client.loop_start()  # Iniciar el loop en segundo plano para recibir mensajes
+    client.connect('localhost', 1883, 60)
+    
+    # Suscribirse a todos los tópicos de clientes
+    client.subscribe('clients/+/sensor/sht3x')
+    client.subscribe('clients/+/sensor/gy302')
+    client.subscribe('clients/+/register')
+    
+    client.loop_start()
+    print("Cliente MQTT inicializado y suscrito a tópicos de múltiples clientes")
