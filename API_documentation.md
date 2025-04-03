@@ -1,6 +1,6 @@
-# Documentación de API - Sistema de Monitoreo Ambiental
+# Documentación de API - Sistema de Monitoreo Ambiental Multi-Cliente
 
-Esta documentación describe todos los endpoints disponibles en la API del sistema de monitoreo ambiental para cultivos de setas.
+Esta documentación describe todos los endpoints disponibles en la API del sistema de monitoreo ambiental para cultivos de setas, con soporte para múltiples dispositivos cliente.
 
 ## Tabla de Contenidos
 - [Gestión de Clientes](#gestión-de-clientes)
@@ -23,11 +23,12 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
     {
       "id": 1,
       "client_id": "mushroom1",
-      "name": "Cultivo de Setas 1",
+      "name": "Orellana Rosada",
       "description": "Cultivo principal de setas Orellana Rosada",
       "last_seen": "2023-11-22T15:30:25",
       "status": "online",
-      "created_at": "2023-11-01T10:00:00"
+      "created_at": "2023-11-01T10:00:00",
+      "manually_disabled": 0
     }
   ]
   ```
@@ -43,11 +44,12 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
   {
     "id": 1,
     "client_id": "mushroom1",
-    "name": "Cultivo de Setas 1",
+    "name": "Orellana Rosada",
     "description": "Cultivo principal de setas Orellana Rosada",
     "last_seen": "2023-11-22T15:30:25",
     "status": "online",
-    "created_at": "2023-11-01T10:00:00"
+    "created_at": "2023-11-01T10:00:00",
+    "manually_disabled": 0
   }
   ```
 
@@ -59,8 +61,8 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
   ```json
   {
     "client_id": "mushroom2",
-    "name": "Cultivo de Setas 2",
-    "description": "Cultivo secundario de setas Orellana"
+    "name": "Shiitake",
+    "description": "Cultivo de setas Shiitake"
   }
   ```
 - **Respuesta**: Confirmación de registro exitoso
@@ -68,15 +70,18 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 ### Actualizar estado de cliente
 - **URL**: `/api/clients/{client_id}/status`
 - **Método**: `PUT`
-- **Descripción**: Actualiza el estado (online/offline) de un cliente.
+- **Descripción**: Actualiza el estado (online/offline) de un cliente. Cuando se establece a 'offline', el cliente se marca como manualmente desactivado y no se reactivará automáticamente con mensajes MQTT.
 - **Parámetros URL**: `client_id` - ID único del cliente
 - **Cuerpo**:
   ```json
   {
-    "status": "online"
+    "status": "offline"
   }
   ```
 - **Respuesta**: Confirmación de actualización exitosa
+- **Notas especiales**: 
+  - Al marcar un cliente como 'offline', permanecerá en ese estado incluso si sigue enviando datos.
+  - Para reactivar un cliente manualmente desactivado, envíe el estado "online".
 
 ## Sensores
 
@@ -85,7 +90,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Obtiene lecturas históricas de temperatura y humedad.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**:
+- **Parámetros Query**: 
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
 - **Respuesta**: Array de lecturas de temperatura y humedad
@@ -108,12 +113,11 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Descripción**: Similar a Sht3xSensor pero para modo manual.
 - **Parámetros**: Igual que el anterior
 
-
 ### Obtener parámetros ideales
 - **URL**: `/api/clients/{client_id}/IdealParams/{param_type}`
 - **Método**: `GET`
 - **Descripción**: Obtiene los parámetros ideales para un tipo específico.
-- **Parámetros URL**:
+- **Parámetros URL**: 
   - `client_id` - ID único del cliente
   - `param_type` - Tipo de parámetro (temperatura, humedad)
 - **Respuesta**: Objeto con rangos mínimo y máximo
@@ -152,7 +156,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Obtiene el historial de eventos y alertas.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**:
+- **Parámetros Query**: 
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
 - **Respuesta**: Array de eventos
@@ -188,7 +192,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Filtra eventos por un tema específico.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**:
+- **Parámetros Query**: 
   - `topic`: Tema por el que filtrar (temperatura, humedad)
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
@@ -198,7 +202,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **URL**: `/api/clients/{client_id}/Event/{id}`
 - **Método**: `DELETE`
 - **Descripción**: Elimina un evento específico.
-- **Parámetros URL**:
+- **Parámetros URL**: 
   - `client_id` - ID único del cliente
   - `id` - ID del evento a eliminar
 - **Respuesta**: Confirmación de eliminación exitosa
@@ -294,7 +298,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **URL**: `/api/clients/{client_id}/Actuator/{id}`
 - **Método**: `PUT`
 - **Descripción**: Actualiza el estado de un actuador específico.
-- **Parámetros URL**:
+- **Parámetros URL**: 
   - `client_id` - ID único del cliente
   - `id` - ID del actuador
 - **Cuerpo**:
