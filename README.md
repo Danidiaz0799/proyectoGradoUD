@@ -57,7 +57,6 @@ Dispositivo que captura datos de sensores y controla actuadores físicos.
 
 #### Hardware
 - Sensores SHT3x (temperatura/humedad)
-- Sensores GY302 (luz)
 - Pantalla OLED para visualización local
 - Actuadores: bombilla 24V, ventiladores 5V, humidificador 24V, motor 5V
 
@@ -71,15 +70,13 @@ Dispositivo que captura datos de sensores y controla actuadores físicos.
 ```
 RaspClient/
 ├── boot.py                 # Inicialización del sistema
-├── projectClient.service   # Configuración systemd 
+├── projectClient.service   # Configuración systemd
 ├── config/                 # Configuraciones
 │   ├── config.py           # Credenciales y endpoints
 │   ├── mqtt_config.py      # Conexión MQTT
 │   └── wifi_config.py      # Conexión Wi-Fi
 ├── sensors/                # Lectura de sensores
 │   ├── sht3x.py            # Sensor temp/humedad
-│   ├── gy302.py            # Sensor de luz
-│   └── bmp280.py           # Sensor presión (no usado)
 └── actuators/              # Control de actuadores
     ├── light.py            # Bombilla
     ├── fan.py              # Ventiladores
@@ -123,13 +120,11 @@ RaspServer/
 1. **Captura** 📊: Los sensores miden condiciones ambientales cada 5 segundos
    ```
    SHT3x → Temperatura (°C), Humedad (%)
-   GY302 → Nivel de luz (lx)
    ```
 
 2. **Transmisión** 📡: Cliente envía datos vía MQTT al servidor
    ```
    Tópico 'sensor/sht3x': "23.5,45.2" (temperatura,humedad)
-   Tópico 'sensor/gy302': "850" (nivel de luz)
    ```
 
 3. **Procesamiento** ⚙️: Servidor evalúa datos contra parámetros ideales
@@ -154,7 +149,6 @@ El servidor expone una API REST completa para interactuar con el sistema:
 
 ### Sensores
 - `GET /api/Sht3xSensor` - Datos de temperatura/humedad (paginados)
-- `GET /api/Gy302Sensor` - Datos de luz (paginados)
 
 ### Actuadores
 - `GET /api/Actuator` - Estado de todos los actuadores
@@ -175,7 +169,7 @@ El servidor expone una API REST completa para interactuar con el sistema:
 ### Raspberry Cliente
 1. Clonar repositorio en la Raspberry Pi cliente
 2. Configurar `config.py` con credenciales Wi-Fi y dirección del servidor
-3. Instalar dependencias: `pip install paho-mqtt adafruit-circuitpython-sht31d adafruit-circuitpython-gy302`
+3. Instalar dependencias: `pip install paho-mqtt adafruit-circuitpython-sht31d`
 4. Instalar como servicio: `sudo cp projectClient.service /etc/systemd/system/`
 5. Activar servicio: `sudo systemctl enable projectClient && sudo systemctl start projectClient`
 
@@ -188,7 +182,7 @@ El servidor expone una API REST completa para interactuar con el sistema:
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Hardware**: Raspberry Pi, sensores SHT3x, GY302, actuadores varios
+- **Hardware**: Raspberry Pi, sensores SHT3x, actuadores varios
 - **Backend**: Python, Flask, SQLite, MQTT (Mosquitto)
 - **Frontend**: Angular
 - **Comunicación**: Protocolo MQTT, API REST

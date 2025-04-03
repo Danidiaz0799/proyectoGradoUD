@@ -73,11 +73,6 @@ El sistema electrónico está compuesto por una red de Raspberry Pis que actúan
   - Precisión de temperatura: ±0.3°C
   - Precisión de humedad: ±2%
   - Interfaz I2C
-- GY302:
-  - Sensor de luz digital
-  - Rango de medición: 0.1 a 65535 lux
-  - Alta precisión y respuesta rápida
-  - Interfaz I2C
 
 **Actuadores:**
 - Ventiladores:
@@ -210,7 +205,6 @@ El sistema se estructura en una arquitectura distribuida con los siguientes comp
 **Raspberry Pi Cliente (Por cada cultivo):**
 - Sensores:
   * SHT3x para temperatura y humedad de alta precisión
-  * GY302 para medición de niveles de luz
   * Conexión I2C directa con Raspberry Pi
 - Actuadores:
   * Ventiladores para control de temperatura
@@ -264,10 +258,6 @@ El sistema se estructura en una arquitectura distribuida con los siguientes comp
   * Rango de humedad: 0-100%
   * Precisión de humedad: ±2%
   * Interfaz I2C
-- GY302:
-  * Rango de luz: 0.1-65535 lux
-  * Alta precisión y respuesta rápida
-  * Interfaz I2C
 
 **Servidor Central (Raspberry Pi 3B+):**
 - Hardware:
@@ -312,7 +302,7 @@ El enfoque del proyecto es experimental y aplicado, basado en una arquitectura c
 ### 7.2 Procedimientos y Estrategias
 
 1. **Diseño e Implementación del Sistema**
-   - Configuración de Raspberry Pi clientes con sensores SHT3x y GY302 mediante conexión I2C
+   - Configuración de Raspberry Pi clientes con sensores SHT3x mediante conexión I2C
    - Implementación del servidor central en Raspberry Pi con broker MQTT y servidor web Flask
    - Integración de actuadores (ventiladores, humidificadores, LEDs) mediante control GPIO
    - Desarrollo de software cliente para gestión de sensores y actuadores

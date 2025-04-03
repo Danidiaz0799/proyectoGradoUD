@@ -5,7 +5,6 @@ from actuators.light import control_light
 from actuators.fan import control_fan
 from actuators.humidifier import control_humidifier
 from actuators.motor import control_motor
-from sensors.gy302 import publish_gy302_data
 from sensors.sht3x import publish_sht3x_data
 from config import config
 from actuators.oled import display_message
@@ -54,15 +53,6 @@ def setup_mqtt_client(client):
     client.subscribe(config.TOPIC_MOTOR)
     register_client(client)  # Registrar el cliente al iniciar y reconectar
 
-# Funcion para publicar datos del sensor GY-302
-def gy302_loop(client):
-    while True:
-        try:
-            publish_gy302_data(client, config.TOPIC_GY302)
-        except OSError as e:
-            print("Error en el loop de sensores GY-302:", str(e))
-        time.sleep(5)
-
 # Funcion para publicar datos del sensor SHT3x
 def sht3x_loop(client):
     while True:
@@ -86,7 +76,6 @@ def main():
             # Iniciar hilos para manejar MQTT y sensores
             threading.Thread(target=mqtt_loop, args=(client,)).start()
             threading.Thread(target=sht3x_loop, args=(client,)).start()
-            threading.Thread(target=gy302_loop, args=(client,)).start()
             
             # Periódicamente re-registrar el cliente para mantener el estado 'online'
             while True:
