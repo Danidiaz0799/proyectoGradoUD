@@ -4,7 +4,7 @@ PASSWORD = 'hola12345'  # Contrasena de la red Wi-Fi
 
 # Identificación del cliente - Debe ser único para cada dispositivo
 CLIENT_ID = 'mushroom1'  # Identificador único del cliente
-CLIENT_NAME = 'Cultivo de Setas 1'  # Nombre descriptivo
+CLIENT_NAME = 'Orellana Rosada'  # Nombre descriptivo
 CLIENT_DESCRIPTION = 'Cultivo principal de setas Orellana Rosada'  # Descripción
 
 # Configuracion del cliente MQTT
