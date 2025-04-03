@@ -85,7 +85,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Obtiene lecturas históricas de temperatura y humedad.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**: 
+- **Parámetros Query**:
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
 - **Respuesta**: Array de lecturas de temperatura y humedad
@@ -108,32 +108,12 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Descripción**: Similar a Sht3xSensor pero para modo manual.
 - **Parámetros**: Igual que el anterior
 
-### Obtener datos de luz
-- **URL**: `/api/clients/{client_id}/Gy302Sensor`
-- **Método**: `GET`
-- **Descripción**: Obtiene lecturas históricas de nivel de luz.
-- **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**: 
-  - `page` (opcional, default=1): Número de página
-  - `pageSize` (opcional, default=10): Tamaño de página
-- **Respuesta**: Array de lecturas de luz
-- **Ejemplo respuesta**:
-  ```json
-  [
-    {
-      "id": 50,
-      "client_id": "mushroom1",
-      "timestamp": "2023-11-22T15:30:25",
-      "light_level": 850.75
-    }
-  ]
-  ```
 
 ### Obtener parámetros ideales
 - **URL**: `/api/clients/{client_id}/IdealParams/{param_type}`
 - **Método**: `GET`
 - **Descripción**: Obtiene los parámetros ideales para un tipo específico.
-- **Parámetros URL**: 
+- **Parámetros URL**:
   - `client_id` - ID único del cliente
   - `param_type` - Tipo de parámetro (temperatura, humedad)
 - **Respuesta**: Objeto con rangos mínimo y máximo
@@ -172,7 +152,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Obtiene el historial de eventos y alertas.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**: 
+- **Parámetros Query**:
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
 - **Respuesta**: Array de eventos
@@ -208,7 +188,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **Método**: `GET`
 - **Descripción**: Filtra eventos por un tema específico.
 - **Parámetros URL**: `client_id` - ID único del cliente
-- **Parámetros Query**: 
+- **Parámetros Query**:
   - `topic`: Tema por el que filtrar (temperatura, humedad)
   - `page` (opcional, default=1): Número de página
   - `pageSize` (opcional, default=10): Tamaño de página
@@ -218,7 +198,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **URL**: `/api/clients/{client_id}/Event/{id}`
 - **Método**: `DELETE`
 - **Descripción**: Elimina un evento específico.
-- **Parámetros URL**: 
+- **Parámetros URL**:
   - `client_id` - ID único del cliente
   - `id` - ID del evento a eliminar
 - **Respuesta**: Confirmación de eliminación exitosa
@@ -314,7 +294,7 @@ Esta documentación describe todos los endpoints disponibles en la API del siste
 - **URL**: `/api/clients/{client_id}/Actuator/{id}`
 - **Método**: `PUT`
 - **Descripción**: Actualiza el estado de un actuador específico.
-- **Parámetros URL**: 
+- **Parámetros URL**:
   - `client_id` - ID único del cliente
   - `id` - ID del actuador
 - **Cuerpo**:

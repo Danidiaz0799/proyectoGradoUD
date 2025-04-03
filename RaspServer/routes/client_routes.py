@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.client import get_all_clients, get_client_by_id, register_client, update_client_status
+from models.client import get_all_clients, get_client_by_id, register_client, update_client_status, enable_client
 
 client_bp = Blueprint('client_bp', __name__)
 
@@ -49,9 +49,15 @@ async def update_status(client_id):
         status = data.get('status')
         
         if not status or status not in ['online', 'offline']:
-            return jsonify({"error": "Estado no válido"}), 400
+            return jsonify({"error": "Estado no valido"}), 400
+        
+        if status == 'online':
+            # Si estamos activando, usar la función específica para ello
+            await enable_client(client_id)
+        else:
+            # Si estamos desactivando, usar función existente
+            await update_client_status(client_id, status)
             
-        await update_client_status(client_id, status)
         return jsonify({"message": "Estado actualizado correctamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

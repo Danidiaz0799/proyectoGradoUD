@@ -1,6 +1,13 @@
 from datetime import datetime
 from .sensor_data import get_db_connection, execute_query_with_retry, execute_write_query_with_retry
 
+# Verificar si un cliente está manualmente desactivado
+async def is_manually_disabled(client_id):
+    query = 'SELECT manually_disabled FROM clients WHERE client_id = ?'
+    params = (client_id,)
+    result = await execute_query_with_retry(query, params)
+    return result[0]['manually_disabled'] == 1 if result else False
+
 # Registrar un nuevo cliente
 async def register_client(client_id, name, description=""):
     # Verificar si el cliente ya existe
@@ -9,19 +16,32 @@ async def register_client(client_id, name, description=""):
         existing = await cursor.fetchone()
     
     if existing:
-        # Actualizar el cliente existente
-        query = '''
-            UPDATE clients 
-            SET name = ?, description = ?, last_seen = ?, status = 'online'
-            WHERE client_id = ?
-        '''
-        params = (name, description, datetime.now().isoformat(), client_id)
+        # Verificar si el cliente está marcado como desactivado manualmente
+        is_disabled = await is_manually_disabled(client_id)
+        
+        if is_disabled:
+            # Solo actualizar last_seen y name/description, pero mantener status=offline
+            query = '''
+                UPDATE clients 
+                SET name = ?, description = ?, last_seen = ?
+                WHERE client_id = ?
+            '''
+            params = (name, description, datetime.now().isoformat(), client_id)
+        else:
+            # Actualizar todos los campos incluyendo estado=online
+            query = '''
+                UPDATE clients 
+                SET name = ?, description = ?, last_seen = ?, status = 'online'
+                WHERE client_id = ?
+            '''
+            params = (name, description, datetime.now().isoformat(), client_id)
+            
         await conn.execute(query, params)
     else:
         # Crear un nuevo cliente
         query = '''
-            INSERT INTO clients (client_id, name, description, last_seen, status, created_at)
-            VALUES (?, ?, ?, ?, 'online', ?)
+            INSERT INTO clients (client_id, name, description, last_seen, status, created_at, manually_disabled)
+            VALUES (?, ?, ?, ?, 'online', ?, 0)
         '''
         params = (client_id, name, description, datetime.now().isoformat(), datetime.now().isoformat())
         await conn.execute(query, params)
@@ -68,12 +88,47 @@ async def initialize_client_config(conn, client_id):
 
 # Actualizar el estado de un cliente
 async def update_client_status(client_id, status='online'):
+    # Si se está desactivando manualmente, marcar la bandera
+    if status == 'offline':
+        query = '''
+            UPDATE clients
+            SET status = ?, last_seen = ?, manually_disabled = 1
+            WHERE client_id = ?
+        '''
+    else:
+        # Verificar si el cliente está manualmente desactivado
+        is_disabled = await is_manually_disabled(client_id)
+        if is_disabled:
+            # Si está manualmente desactivado, solo actualizar last_seen pero mantener offline
+            query = '''
+                UPDATE clients
+                SET last_seen = ?
+                WHERE client_id = ?
+            '''
+            params = (datetime.now().isoformat(), client_id)
+        else:
+            # De lo contrario, actualizar a online normalmente
+            query = '''
+                UPDATE clients
+                SET status = ?, last_seen = ?, manually_disabled = 0
+                WHERE client_id = ?
+            '''
+            params = (status, datetime.now().isoformat(), client_id)
+        
+        await execute_write_query_with_retry(query, params)
+        return
+    
+    params = (status, datetime.now().isoformat(), client_id)
+    await execute_write_query_with_retry(query, params)
+
+# Reactivar un cliente manualmente
+async def enable_client(client_id):
     query = '''
         UPDATE clients
-        SET status = ?, last_seen = ?
+        SET status = 'online', manually_disabled = 0
         WHERE client_id = ?
     '''
-    params = (status, datetime.now().isoformat(), client_id)
+    params = (client_id,)
     await execute_write_query_with_retry(query, params)
 
 # Obtener todos los clientes registrados

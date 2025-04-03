@@ -74,10 +74,18 @@ def create_tables():
             description TEXT,
             last_seen TEXT,
             status TEXT DEFAULT 'offline',
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            manually_disabled INTEGER DEFAULT 0
         )
     ''')
     print("Tabla clients creada o ya existe.")
+
+    # Verificar si la columna manually_disabled existe en la tabla clients
+    c.execute("PRAGMA table_info(clients)")
+    columns = [column[1] for column in c.fetchall()]
+    if 'manually_disabled' not in columns:
+        c.execute("ALTER TABLE clients ADD COLUMN manually_disabled INTEGER DEFAULT 0")
+        print("Columna manually_disabled anadida a la tabla clients")
 
     # Insertar cliente predeterminado si no existe
     c.execute('SELECT COUNT(*) FROM clients WHERE client_id = "mushroom1"')
