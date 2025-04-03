@@ -5,17 +5,6 @@ def create_tables():
     conn = sqlite3.connect('/home/stevpi/Desktop/raspServer/sensor_data.db')
     c = conn.cursor()
 
-    # Crear tabla para datos de sensore GY-302
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS gy302_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            client_id TEXT NOT NULL,
-            timestamp TEXT NOT NULL,
-            light_level REAL NOT NULL
-        )
-    ''')
-    print("Tabla gy302_data creada o ya existe.")
-
     # Crear tabla para datos de sensore SHT3x
     c.execute('''
         CREATE TABLE IF NOT EXISTS sht3x_data (

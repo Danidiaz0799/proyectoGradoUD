@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 import asyncio
-from models.sensor_data import get_all_sht3x_data, get_all_gy302_data, get_ideal_params, update_ideal_params
+from models.sensor_data import get_all_sht3x_data, get_ideal_params, update_ideal_params
 from models.client import client_exists
 from mqtt_client import publish_message
 
@@ -29,18 +29,6 @@ async def get_sht3x_sensor_data_manual(client_id):
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('pageSize', 10))
     data = await get_all_sht3x_data(client_id, page, page_size)
-    return jsonify([dict(row) for row in data])
-
-# API para obtener datos de sensores GY-302 desde la base de datos
-@sensor_bp.route('/clients/<client_id>/Gy302Sensor', methods=['GET'])
-async def get_gy302_sensor_data(client_id):
-    # Verificar que el cliente existe
-    if not await client_exists(client_id):
-        return jsonify({"error": "Cliente no encontrado"}), 404
-        
-    page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('pageSize', 10))
-    data = await get_all_gy302_data(client_id, page, page_size)
     return jsonify([dict(row) for row in data])
 
 # API para obtener parametros ideales

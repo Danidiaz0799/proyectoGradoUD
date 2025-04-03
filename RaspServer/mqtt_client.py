@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from models.sensor_data import save_sht3x_data, save_gy302_data, get_ideal_params
+from models.sensor_data import save_sht3x_data, get_ideal_params
 from models.event import save_event
 from models.client import update_client_status, register_client, client_exists
 import time
@@ -9,9 +9,9 @@ import asyncio
 import re
 
 client = None
-client_last_events = {}  # Diccionario para rastrear el último evento por cliente y tipo
+client_last_events = {}  # Diccionario para rastrear el ultimo evento por cliente y tipo
 
-# Función para extraer el client_id de un tópico MQTT
+# Funcion para extraer el client_id de un topico MQTT
 def extract_client_id(topic):
     # El formato esperado es 'clients/{client_id}/...'
     match = re.match(r'clients/([^/]+)/', topic)
@@ -22,7 +22,7 @@ def extract_client_id(topic):
 # Funcion de callback cuando se recibe un mensaje MQTT
 def on_message(client, userdata, msg):
     try:
-        # Extraer el client_id del tópico
+        # Extraer el client_id del topico
         client_id = extract_client_id(msg.topic)
         if not client_id:
             print(f"No se pudo extraer client_id del topico: {msg.topic}")
@@ -31,15 +31,12 @@ def on_message(client, userdata, msg):
         # Actualizar estado del cliente
         asyncio.run(update_client_status(client_id))
         
-        # Procesar el mensaje según el tópico
+        # Procesar el mensaje segun el topico
         if msg.topic == f'clients/{client_id}/sensor/sht3x':
             data = msg.payload.decode('utf-8', errors='ignore').split(',')
             if len(data) == 2:
                 asyncio.run(handle_sht3x_message(client_id, data))
-        elif msg.topic == f'clients/{client_id}/sensor/gy302':
-            data = msg.payload.decode('utf-8', errors='ignore').split(',')
-            if len(data) == 1:
-                asyncio.run(handle_gy302_message(client_id, data))
+
         elif msg.topic == f'clients/{client_id}/register':
             data = msg.payload.decode('utf-8', errors='ignore').split(',')
             if len(data) >= 2:
@@ -48,7 +45,7 @@ def on_message(client, userdata, msg):
                 asyncio.run(register_client(client_id, name, description))
                 print(f"Cliente {client_id} registrado: {name}")
         else:
-            print(f"Tópico no reconocido: {msg.topic}")
+            print(f"Topico no reconocido: {msg.topic}")
     except Exception as e:
         print(f'Error al procesar el mensaje: {e}')
 
@@ -76,7 +73,7 @@ async def handle_sht3x_message(client_id, data):
     min_humidity = ideal_humidity_params['min_value']
     max_humidity = ideal_humidity_params['max_value']
 
-    # Verificar si la temperatura o la humedad están fuera de los parámetros
+    # Verificar si la temperatura o la humedad estan fuera de los parametros
     if not (min_temp <= temperatura <= max_temp):
         if current_time - client_last_events[client_id]['temp'] > 60:
             await save_event(client_id, f"Advertencia! Temperatura fuera de rango: {temperatura} C (Ideal: {min_temp}-{max_temp} C)", "temperatura")
@@ -87,7 +84,7 @@ async def handle_sht3x_message(client_id, data):
             await save_event(client_id, f"Advertencia! Humedad fuera de rango: {humedad} % (Ideal: {min_humidity}-{max_humidity} %)", "humedad")
             client_last_events[client_id]['hum'] = current_time
 
-    # Verificar el estado de la aplicación para este cliente
+    # Verificar el estado de la aplicacion para este cliente
     app_state = await get_app_state(client_id)
     if app_state == 'automatico':
         await update_actuators(client_id, temperatura, humedad)
@@ -145,18 +142,13 @@ async def update_actuator_and_log(client_id, actuator_id, state, description, to
         await publish_message(topic, str(state).lower())
         print(f'Cliente {client_id} - {description}: {state}')
 
-async def handle_gy302_message(client_id, data):
-    nivel_luz = data[0]
-    print(f'Cliente {client_id} - Nivel de luz: {nivel_luz} lx')
-    await save_gy302_data(client_id, nivel_luz)
-
 # Funcion para publicar mensajes MQTT
 async def publish_message(topic, message):
     global client
     if client:
         client.publish(topic, message)
     else:
-        print("Cliente MQTT no está conectado")
+        print("Cliente MQTT no esta conectado")
 
 # Configuracion del cliente MQTT
 def connect_mqtt():
@@ -165,10 +157,9 @@ def connect_mqtt():
     client.on_message = on_message
     client.connect('localhost', 1883, 60)
     
-    # Suscribirse a todos los tópicos de clientes
+    # Suscribirse a todos los topicos de clientes
     client.subscribe('clients/+/sensor/sht3x')
-    client.subscribe('clients/+/sensor/gy302')
     client.subscribe('clients/+/register')
     
     client.loop_start()
-    print("Cliente MQTT inicializado y suscrito a tópicos de múltiples clientes")
+    print("Cliente MQTT inicializado y suscrito a topicos de multiples clientes")

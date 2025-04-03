@@ -55,23 +55,6 @@ async def get_all_sht3x_data(client_id, page, page_size):
     await conn.close()
     return data
 
-# Guardar datos del gy302 en la base de datos
-async def save_gy302_data(client_id, light_level):
-    query = 'INSERT INTO gy302_data (client_id, timestamp, light_level) VALUES (?, ?, ?)'
-    params = (client_id, datetime.now().isoformat(), light_level)
-    await execute_write_query_with_retry(query, params)
-
-# Obtener todos los datos de gy302 desde la base de datos
-async def get_all_gy302_data(client_id, page, page_size):
-    conn = await get_db_connection()
-    async with conn.execute(
-        'SELECT * FROM gy302_data WHERE client_id = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?',
-        (client_id, page_size, (page - 1) * page_size)
-    ) as cursor:
-        data = await cursor.fetchall()
-    await conn.close()
-    return data
-
 # Obtener parametros ideales desde la base de datos
 async def get_ideal_params(client_id, param_type):
     query = 'SELECT * FROM ideal_params WHERE client_id = ? AND param_type = ? ORDER BY timestamp DESC LIMIT 1'
